@@ -18,6 +18,8 @@ import {
   Sun,
   Layers,
   Crown,
+  FileEdit,
+  ImageIcon,
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useUser } from "@clerk/nextjs"
@@ -101,6 +103,16 @@ export function DashboardSidebar() {
       title: "Resume",
       href: "/dashboard/resume",
       icon: FileText,
+    },
+    {
+      title: "Cover Letter",
+      href: "/dashboard/cover-letter",
+      icon: FileEdit,
+    },
+    {
+      title: "Image Generator",
+      href: "/dashboard/image-generator",
+      icon: ImageIcon,
     },
     {
       title: "Profile",

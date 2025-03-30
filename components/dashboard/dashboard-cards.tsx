@@ -1,15 +1,22 @@
 import Link from "next/link"
-import { Briefcase, FileText, Upload, User, Shield, Layers } from "lucide-react"
+import { Briefcase, FileText, Upload, User, Shield, Layers, Lightbulb, Radar, Code, Globe, FileEdit, ImageIcon } from "lucide-react"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
 export function DashboardCards() {
   const cards = [
     {
-      title: "Create Portfolio",
+      title: "Create Portfolio design" ,
       description: "Generate an AI-powered professional portfolio",
       icon: Briefcase,
       href: "/dashboard/create-portfolio",
+      color: "bg-red-500/10",
+    },
+    {
+      title: "AI Website Builder",
+      description: "Create custom websites with live preview",
+      icon: Globe,
+      href: "/dashboard/website-builder",
       color: "bg-blue-500/10",
     },
     {
@@ -32,6 +39,34 @@ export function DashboardCards() {
       icon: FileText,
       href: "/dashboard/ai-resume",
       color: "bg-amber-500/10",
+    },
+    {
+      title: "AI Cover Letter",
+      description: "Create targeted cover letters with AI",
+      icon: FileEdit,
+      href: "/dashboard/cover-letter",
+      color: "bg-emerald-500/10",
+    },
+    {
+      title: "AI Image Generator",
+      description: "Create stunning images with Gemini 2.0",
+      icon: ImageIcon,
+      href: "/dashboard/image-generator",
+      color: "bg-pink-500/10",
+    },
+    {
+      title: "Project Ideas",
+      description: "Get AI-powered project suggestions",
+      icon: Lightbulb,
+      href: "/dashboard/project-suggestions",
+      color: "bg-violet-500/10",
+    },
+    {
+      title: "AI Content Detector",
+      description: "Detect AI-generated content with our model",
+      icon: Radar,
+      href: "/dashboard/ai-detection",
+      color: "bg-indigo-500/10",
     },
     {
       title: "Web3 Verification",

@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize the Google Generative AI with API key
 export const initGemini = () => {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("Missing Gemini API key");
   }
@@ -20,7 +20,7 @@ export const generateWebsiteCode = async (
 ) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
     const { colorScheme = "blue", style = "modern", sections = ["about", "experience", "projects", "skills", "contact"] } = preferences;
 
@@ -83,7 +83,7 @@ export const generateWebsiteCode = async (
 export const generatePortfolioSuggestions = async (portfolioData: any) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
     const prompt = `
       Analyze this portfolio data and provide 5 specific suggestions to improve it:
@@ -112,7 +112,7 @@ export const generatePortfolioSuggestions = async (portfolioData: any) => {
 export const extractLinkedInProfile = async (linkedinUrl: string) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
     const prompt = `
       You are a professional data extractor. I'll provide a LinkedIn profile URL: ${linkedinUrl}
@@ -161,7 +161,7 @@ export const extractLinkedInProfile = async (linkedinUrl: string) => {
 export const extractGitHubProfile = async (githubUrl: string) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
     const prompt = `
       You are a professional data extractor. I'll provide a GitHub profile URL: ${githubUrl}
@@ -208,7 +208,7 @@ export const extractGitHubProfile = async (githubUrl: string) => {
 export const extractLeetCodeProfile = async (leetcodeUrl: string) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
     const prompt = `
       You are a professional data extractor. I'll provide a LeetCode profile URL: ${leetcodeUrl}
@@ -259,7 +259,7 @@ export const combineProfiles = async (profiles: {
 }) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
     const prompt = `
       You are a professional profile integrator. I'll provide data from multiple sources:
@@ -305,6 +305,161 @@ export const combineProfiles = async (profiles: {
     }
   } catch (error) {
     console.error("Error combining profiles:", error);
+    throw error;
+  }
+};
+
+// Generate project suggestions based on user skills and interests
+export const generateProjectSuggestions = async (userData: any) => {
+  try {
+    const genAI = initGemini();
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
+    const prompt = `
+      You are a tech project advisor. Generate creative project ideas tailored to this user's profile:
+      ${JSON.stringify(userData, null, 2)}
+      
+      For each project idea, provide:
+      1. Project title - creative and specific
+      2. Short description (30-40 words)
+      3. Skills needed - list of required skills
+      4. Difficulty level (Beginner, Intermediate, Advanced)
+      5. Estimated completion time in hours or days
+      6. How it benefits the portfolio
+      7. Tech stack recommendation
+      
+      Generate 3 projects that would showcase the user's skills effectively.
+      Format response as a JSON array with objects for each project idea.
+      
+      Example format:
+      [
+        {
+          "title": "Project Title",
+          "description": "Short description of the project",
+          "skills": ["Skill1", "Skill2"],
+          "difficulty": "Intermediate",
+          "timeEstimate": "20-30 hours",
+          "portfolioBenefit": "Shows proficiency in X",
+          "techStack": ["Tech1", "Tech2"]
+        }
+      ]
+    `;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    // Extract the JSON object from the response
+    const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/) || 
+                      text.match(/```\n([\s\S]*?)\n```/) || 
+                      text.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                      
+    if (jsonMatch) {
+      try {
+        const jsonStr = jsonMatch[1] || jsonMatch[0];
+        return JSON.parse(jsonStr);
+      } catch (e) {
+        console.error("Failed to parse JSON from project suggestions:", e);
+        throw new Error("Failed to generate project suggestions");
+      }
+    } else {
+      console.error("No JSON found in Gemini response for project suggestions");
+      throw new Error("Invalid response format from AI");
+    }
+  } catch (error) {
+    console.error("Error generating project suggestions:", error);
+    throw error;
+  }
+};
+
+// Generate content improvement suggestions for portfolio sections
+export const generateContentImprovements = async (
+  sectionType: 'about' | 'overview' | 'description' | 'project' | 'skills',
+  currentContent: string,
+  userData?: any
+) => {
+  try {
+    const genAI = initGemini();
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
+    let sectionContext = '';
+    switch (sectionType) {
+      case 'about':
+        sectionContext = 'About section should showcase the person\'s background, experience, and personality in a professional yet engaging way';
+        break;
+      case 'overview':
+        sectionContext = 'Overview should provide a concise summary of the portfolio and key professional highlights';
+        break;
+      case 'description':
+        sectionContext = 'Description should provide a compelling introduction to the portfolio and establish professional identity';
+        break;
+      case 'project':
+        sectionContext = 'Project descriptions should highlight technical challenges, solutions, key technologies, and results';
+        break;
+      case 'skills':
+        sectionContext = 'Skills section should be well-organized, comprehensive, and demonstrate both technical and soft skills relevant to the industry';
+        break;
+    }
+
+    const prompt = `
+      You are an expert portfolio content advisor. I'll provide content for a ${sectionType} section that needs improvement.
+      
+      Current Content:
+      """
+      ${currentContent}
+      """
+      
+      ${userData ? `Additional user data: ${JSON.stringify(userData, null, 2)}` : ''}
+      
+      Context: ${sectionContext}
+      
+      Provide three alternative, improved versions of this content with the following qualities:
+      1. Professional but personable tone
+      2. Specific and concrete rather than generic
+      3. Highlighting key achievements and skills
+      4. Using active voice and strong verbs
+      5. Appropriate length for a portfolio ${sectionType} section
+      
+      For each suggestion:
+      1. Provide a title characterizing the style (e.g., "Concise & Technical", "Narrative Approach", "Achievement-Focused")
+      2. Provide the improved content
+      3. Add a brief explanation of what you improved
+      
+      Format as a JSON object with an array of suggestions:
+      {
+        "suggestions": [
+          {
+            "title": "Suggestion title",
+            "content": "Improved content here",
+            "explanation": "What was improved and why"
+          }
+        ]
+      }
+    `;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    // Extract the JSON object from the response
+    const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/) || 
+                      text.match(/```\n([\s\S]*?)\n```/) || 
+                      text.match(/\{\s*"suggestions"\s*:/);
+                      
+    if (jsonMatch) {
+      try {
+        const jsonStr = jsonMatch[1] || jsonMatch[0];
+        return JSON.parse(jsonStr);
+      } catch (e) {
+        console.error("Failed to parse JSON from content improvements:", e);
+        throw new Error("Failed to generate content improvement suggestions");
+      }
+    } else {
+      console.error("No JSON found in Gemini response for content improvements");
+      throw new Error("Invalid response format from AI");
+    }
+  } catch (error) {
+    console.error("Error generating content improvements:", error);
     throw error;
   }
 };

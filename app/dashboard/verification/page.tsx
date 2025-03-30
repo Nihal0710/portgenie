@@ -8,367 +8,368 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Shield, ExternalLink, CheckCircle2, AlertCircle, FileCheck, Link2 } from "lucide-react";
+import { Loader2, Shield, ExternalLink, CheckCircle2, AlertCircle, FileCheck, Link2, Share2, BookOpen } from "lucide-react";
 import { getIPFSRecords, getVerifications } from "@/lib/supabase";
 import { getTransactionUrl, isDocumentVerified, getVerificationDetails } from "@/lib/ethereum";
 import { verifyIPFSHash } from "@/lib/pinata";
 import { WalletConnect } from "@/components/wallet-connect";
+import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { getUserWeb3Credentials, getUserIpfsFiles } from '@/lib/supabase';
 
-export default function VerificationPage() {
-  const { user, isLoaded, isSignedIn } = useUser();
-  const [loading, setLoading] = useState(true);
-  const [verifications, setVerifications] = useState<any[]>([]);
-  const [ipfsRecords, setIpfsRecords] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState("verifications");
-  const [verifying, setVerifying] = useState(false);
-  const [verificationHash, setVerificationHash] = useState("");
-  const [verificationResult, setVerificationResult] = useState<any>(null);
-  const [verificationStatus, setVerificationStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const { toast } = useToast();
-
-  // Load user's verifications and IPFS records
-  useEffect(() => {
-    const loadData = async () => {
-      if (isLoaded && isSignedIn && user) {
-        try {
-          const [userVerifications, userIpfsRecords] = await Promise.all([
-            getVerifications(user.id),
-            getIPFSRecords(user.id)
-          ]);
-          
-          setVerifications(userVerifications);
-          setIpfsRecords(userIpfsRecords);
-        } catch (error) {
-          console.error("Error loading verification data:", error);
-          toast({
-            title: "Error",
-            description: "Failed to load verification data. Please try again.",
-            variant: "destructive",
-          });
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadData();
-  }, [isLoaded, isSignedIn, user, toast]);
-
-  const handleVerifyTransaction = async () => {
-    if (!verificationHash) {
-      toast({
-        title: "Input Required",
-        description: "Please enter a transaction hash to verify.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setVerificationStatus("loading");
-    
-    try {
-      // Get verification details from blockchain
-      const details = await getVerificationDetails(verificationHash);
-      
-      // Check if IPFS hash is valid
-      const isIPFSValid = await verifyIPFSHash(details.documentHash);
-      
-      setVerificationResult({
-        ...details,
-        isIPFSValid,
-        transactionUrl: getTransactionUrl(verificationHash)
-      });
-      
-      setVerificationStatus("success");
-    } catch (error) {
-      console.error("Error verifying transaction:", error);
-      setVerificationStatus("error");
-      toast({
-        title: "Verification Failed",
-        description: "Could not verify the provided transaction hash. Please check and try again.",
-        variant: "destructive",
-      });
-    }
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Web3 Verification - PortGenie',
+    description: 'Manage your blockchain-verified content and credentials',
   };
+}
 
-  if (!isLoaded || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+async function getServerSideData() {
+  // For demo purposes, we'll use mock data
+  // In a real implementation, get the actual user ID from the auth session
+  const userId = 'user123';
+  
+  try {
+    // Fetch user's Web3 credentials
+    const credentials = await getUserWeb3Credentials(userId);
+    
+    // Fetch user's IPFS files
+    const ipfsFiles = await getUserIpfsFiles(userId);
+    
+    return {
+      credentials: credentials || [],
+      ipfsFiles: ipfsFiles || [],
+    };
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return {
+      credentials: [],
+      ipfsFiles: [],
+    };
   }
+}
 
+export default async function VerificationPage() {
+  const { credentials, ipfsFiles } = await getServerSideData();
+
+  // Add a special demo credential for display purposes
+  const demoCredentials = [
+    {
+      id: 'demo-1',
+      credential_type: 'portfolio',
+      blockchain: 'ethereum',
+      contract_address: '0x1234567890123456789012345678901234567890',
+      token_id: '1',
+      wallet_address: '0xabcdef1234567890abcdef1234567890abcdef12',
+      verification_status: 'verified',
+      is_verified: true,
+      created_at: new Date().toISOString(),
+      entity_id: 'portfolio-123',
+      transaction_hash: '0x7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456',
+      metadata_uri: 'ipfs://bafybeidqvihld4k77iqe2qiiu5ajlktcxvswbj7eivplh3tm2tedrlzeym',
+    }
+  ];
+  
+  // Add demo IPFS file
+  const demoIpfsFiles = [
+    {
+      id: 'demo-ipfs-1',
+      file_name: 'portfolio-certificate.json',
+      file_type: 'application/json',
+      file_size: 1024,
+      ipfs_hash: 'bafybeidqvihld4k77iqe2qiiu5ajlktcxvswbj7eivplh3tm2tedrlzeym',
+      ipfs_url: 'ipfs://bafybeidqvihld4k77iqe2qiiu5ajlktcxvswbj7eivplh3tm2tedrlzeym',
+      pinata_id: 'demo-pin-id',
+      related_entity_type: 'portfolio',
+      related_entity_id: 'portfolio-123',
+      created_at: new Date().toISOString(),
+      pinned_at: new Date().toISOString(),
+    }
+  ];
+  
+  // Combine real and demo data
+  const allCredentials = [...demoCredentials, ...credentials];
+  const allIpfsFiles = [...demoIpfsFiles, ...ipfsFiles];
+  
   return (
-    <div className="container py-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div className="container mx-auto py-6 space-y-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Web3 Verification</h1>
-          <p className="text-muted-foreground mt-1">
-            Verify your credentials on the blockchain and manage your IPFS records
+          <p className="text-muted-foreground">
+            Manage your blockchain-verified content and credentials
           </p>
         </div>
-        <WalletConnect className="w-full md:w-auto" />
+        <Button className="gap-2">
+          <Shield className="h-4 w-4" />
+          Verify New Content
+        </Button>
       </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3 mb-8">
-          <TabsTrigger value="verifications">Verifications</TabsTrigger>
-          <TabsTrigger value="ipfs">IPFS Records</TabsTrigger>
-          <TabsTrigger value="verify">Verify Transaction</TabsTrigger>
-        </TabsList>
+      
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Shield className="h-5 w-5 text-primary" />
+              Blockchain Verification
+            </CardTitle>
+            <CardDescription>
+              Your content verified on the blockchain with tamper-proof authentication
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm">
+            <p className="mb-4">
+              Web3 verification provides tamper-proof authentication for your portfolios, resumes, and certificates using 
+              blockchain technology and IPFS (InterPlanetary File System). When your content is verified:
+            </p>
+            <ul className="list-disc pl-5 space-y-1 mb-4">
+              <li>It's stored permanently on IPFS with content addressing</li>
+              <li>Ownership is recorded on the blockchain as an NFT</li>
+              <li>Anyone can verify authenticity without depending on a central authority</li>
+              <li>You can prove ownership by connecting your crypto wallet</li>
+            </ul>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline" className="gap-2" asChild>
+              <a href="/docs/WEB3_VERIFICATION.md" target="_blank">
+                <BookOpen className="h-4 w-4" />
+                Learn More
+              </a>
+            </Button>
+          </CardFooter>
+        </Card>
         
-        <TabsContent value="verifications" className="space-y-4">
-          {verifications.length === 0 ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>No Verifications Found</CardTitle>
-                <CardDescription>
-                  You haven't verified any documents on the blockchain yet.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Verify your portfolios and resumes to add them to the blockchain for immutable proof of authenticity.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {verifications.map((verification) => (
-                <Card key={verification.id}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Shield className="mr-2 h-5 w-5 text-green-500" />
-                      {verification.reference_type === 'portfolio' ? 'Portfolio Verification' : 'Resume Verification'}
-                    </CardTitle>
+        <Tabs defaultValue="credentials">
+          <div className="flex justify-between items-center mb-4">
+            <TabsList>
+              <TabsTrigger value="credentials" className="gap-2">
+                <Shield className="h-4 w-4" />
+                Credentials
+              </TabsTrigger>
+              <TabsTrigger value="ipfs" className="gap-2">
+                <FileCheck className="h-4 w-4" />
+                IPFS Content
+              </TabsTrigger>
+            </TabsList>
+          </div>
+          
+          <TabsContent value="credentials" className="space-y-4">
+            {allCredentials.length > 0 ? (
+              allCredentials.map((credential) => (
+                <Card key={credential.id}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg capitalize">
+                        {credential.credential_type} Verification
+                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant={credential.is_verified ? "success" : "pending"}
+                          label={credential.is_verified ? "Verified" : "Pending"} 
+                        />
+                      </div>
+                    </div>
                     <CardDescription>
-                      Verified on {new Date(verification.created_at).toLocaleDateString()}
+                      Created on {new Date(credential.created_at).toLocaleDateString()}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Blockchain:</span>
-                        <span>{verification.blockchain}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Status:</span>
-                        <span className="flex items-center">
-                          <CheckCircle2 className="mr-1 h-4 w-4 text-green-500" />
-                          {verification.status}
-                        </span>
-                      </div>
-                      {verification.ipfs_hash && (
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">IPFS Hash:</span>
-                          <span className="font-mono text-xs truncate max-w-[200px]">{verification.ipfs_hash}</span>
+                  <CardContent className="pb-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <h3 className="text-sm font-medium mb-1">Blockchain Details</h3>
+                        <div className="space-y-1 text-sm">
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Network:</span>
+                            <span className="font-medium capitalize">{credential.blockchain}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Contract:</span>
+                            <span className="font-mono text-xs truncate max-w-[200px]">
+                              {credential.contract_address}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Token ID:</span>
+                            <span className="font-mono">{credential.token_id}</span>
+                          </div>
                         </div>
-                      )}
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium mb-1">Wallet Information</h3>
+                        <div className="space-y-1 text-sm">
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Wallet Address:</span>
+                            <span className="font-mono text-xs truncate max-w-[200px]">
+                              {credential.wallet_address}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Transaction:</span>
+                            <a 
+                              href={`https://etherscan.io/tx/${credential.transaction_hash}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-mono text-xs text-blue-600 hover:underline truncate max-w-[200px]"
+                            >
+                              {credential.transaction_hash.substring(0, 10)}...
+                            </a>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" asChild className="w-full">
+                  <CardFooter className="flex justify-between">
+                    <Button variant="outline" className="gap-2" asChild>
                       <a 
-                        href={getTransactionUrl(verification.transaction_hash)} 
+                        href={`/verify/${credential.metadata_uri.replace('ipfs://', '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        View on Blockchain
+                        <CheckCircle2 className="h-4 w-4" />
+                        Verify
+                      </a>
+                    </Button>
+                    <Button className="gap-2" asChild>
+                      <a 
+                        href={`/verify/${credential.metadata_uri.replace('ipfs://', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Share2 className="h-4 w-4" />
+                        Share Verification
                       </a>
                     </Button>
                   </CardFooter>
                 </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="ipfs" className="space-y-4">
-          {ipfsRecords.length === 0 ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>No IPFS Records Found</CardTitle>
-                <CardDescription>
-                  You haven't stored any documents on IPFS yet.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  When you create portfolios and resumes, they will be stored on IPFS for decentralized access.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {ipfsRecords.map((record) => (
-                <Card key={record.id}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">
-                      {record.file_name || record.content_type}
-                    </CardTitle>
-                    <CardDescription>
-                      Stored on {new Date(record.created_at).toLocaleDateString()}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Type:</span>
-                        <span>{record.content_type}</span>
+              ))
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>No Credentials Found</CardTitle>
+                  <CardDescription>
+                    You haven't verified any content on the blockchain yet.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Get started by verifying your portfolio, resume, or certificates on the blockchain.
+                    This creates a tamper-proof, permanent record of your achievements.
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button>Verify Your First Content</Button>
+                </CardFooter>
+              </Card>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="ipfs" className="space-y-4">
+            {allIpfsFiles.length > 0 ? (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {allIpfsFiles.map((file) => (
+                  <Card key={file.id} className="overflow-hidden">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base truncate">
+                        {file.file_name}
+                      </CardTitle>
+                      <CardDescription className="truncate">
+                        {file.file_type} • {formatFileSize(file.file_size)}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pb-2">
+                      <div className="mb-2">
+                        <span className="text-xs font-medium">IPFS Hash</span>
+                        <p className="font-mono text-xs truncate bg-muted p-1.5 rounded">
+                          {file.ipfs_hash}
+                        </p>
                       </div>
-                      {record.file_size && (
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Size:</span>
-                          <span>{(record.file_size / 1024).toFixed(2)} KB</span>
+                      <div className="text-xs grid grid-cols-2 gap-2">
+                        <div>
+                          <span className="block font-medium">Created</span>
+                          <span className="text-muted-foreground">
+                            {new Date(file.created_at).toLocaleDateString()}
+                          </span>
                         </div>
-                      )}
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">IPFS Hash:</span>
-                        <span className="font-mono text-xs truncate max-w-[200px]">{record.ipfs_hash}</span>
+                        <div>
+                          <span className="block font-medium">Type</span>
+                          <span className="text-muted-foreground capitalize">
+                            {file.related_entity_type || 'File'}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" asChild className="w-full">
-                      <a 
-                        href={`https://gateway.pinata.cloud/ipfs/${record.ipfs_hash}`} 
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        View on IPFS
-                      </a>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="verify">
-          <Card>
-            <CardHeader>
-              <CardTitle>Verify Blockchain Transaction</CardTitle>
-              <CardDescription>
-                Enter a transaction hash to verify its authenticity and view the associated document
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="txHash">Transaction Hash</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    id="txHash"
-                    placeholder="0x..."
-                    value={verificationHash}
-                    onChange={(e) => setVerificationHash(e.target.value)}
-                  />
-                  <Button 
-                    onClick={handleVerifyTransaction}
-                    disabled={verificationStatus === "loading" || !verificationHash}
-                  >
-                    {verificationStatus === "loading" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Verify
-                  </Button>
-                </div>
-              </div>
-              
-              {verificationStatus === "success" && verificationResult && (
-                <div className="bg-muted p-6 rounded-md">
-                  <div className="flex items-center mb-4">
-                    <CheckCircle2 className="h-6 w-6 text-green-500 mr-2" />
-                    <h3 className="text-lg font-semibold">Verification Successful</h3>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-3 gap-2 text-sm">
-                      <span className="text-muted-foreground">Verifier:</span>
-                      <span className="col-span-2 font-mono truncate">{verificationResult.verifier}</span>
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-2 text-sm">
-                      <span className="text-muted-foreground">Document Hash:</span>
-                      <span className="col-span-2 font-mono truncate">{verificationResult.documentHash}</span>
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-2 text-sm">
-                      <span className="text-muted-foreground">Document URI:</span>
-                      <span className="col-span-2 font-mono truncate">{verificationResult.documentURI}</span>
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-2 text-sm">
-                      <span className="text-muted-foreground">Timestamp:</span>
-                      <span className="col-span-2">
-                        {new Date(verificationResult.timestamp * 1000).toLocaleString()}
-                      </span>
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-2 text-sm">
-                      <span className="text-muted-foreground">IPFS Status:</span>
-                      <span className="col-span-2 flex items-center">
-                        {verificationResult.isIPFSValid ? (
-                          <>
-                            <CheckCircle2 className="h-4 w-4 text-green-500 mr-1" />
-                            Available on IPFS
-                          </>
-                        ) : (
-                          <>
-                            <AlertCircle className="h-4 w-4 text-yellow-500 mr-1" />
-                            Not found on IPFS
-                          </>
-                        )}
-                      </span>
-                    </div>
-                    
-                    <div className="pt-4">
-                      <Button variant="outline" asChild className="w-full">
-                        <a 
-                          href={verificationResult.transactionUrl} 
+                    </CardContent>
+                    <CardFooter className="flex justify-between">
+                      <Button size="sm" variant="outline" className="gap-1" asChild>
+                        <a
+                          href={`https://gateway.pinata.cloud/ipfs/${file.ipfs_hash}`}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                          View Transaction
+                          <ExternalLink className="h-3 w-3" />
+                          View
                         </a>
                       </Button>
-                    </div>
-                    
-                    {verificationResult.isIPFSValid && verificationResult.documentURI.startsWith('ipfs://') && (
-                      <div>
-                        <Button variant="outline" asChild className="w-full">
-                          <a 
-                            href={`https://gateway.pinata.cloud/ipfs/${verificationResult.documentURI.replace('ipfs://', '')}`} 
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <FileCheck className="mr-2 h-4 w-4" />
-                            View Document
-                          </a>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-              
-              {verificationStatus === "error" && (
-                <div className="bg-destructive/10 p-6 rounded-md">
-                  <div className="flex items-center mb-4">
-                    <AlertCircle className="h-6 w-6 text-destructive mr-2" />
-                    <h3 className="text-lg font-semibold">Verification Failed</h3>
-                  </div>
-                  <p className="text-sm">
-                    The transaction hash could not be verified. Please check that you entered a valid verification transaction hash.
+                      <Button size="sm" className="gap-1" asChild>
+                        <a
+                          href={`/verify/${file.ipfs_hash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <CheckCircle2 className="h-3 w-3" />
+                          Verify
+                        </a>
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>No IPFS Content Found</CardTitle>
+                  <CardDescription>
+                    You haven't stored any content on IPFS yet.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    When you verify content, it's automatically stored on IPFS (InterPlanetary File System),
+                    a distributed storage network that ensures your content remains accessible and unchanged.
                   </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                </CardContent>
+                <CardFooter>
+                  <Button>Upload to IPFS</Button>
+                </CardFooter>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
+}
+
+// Helper components
+
+function Badge({ variant, label }: { variant: 'success' | 'pending' | 'error', label: string }) {
+  const variantStyles = {
+    success: "bg-green-50 text-green-700 border-green-200",
+    pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
+    error: "bg-red-50 text-red-700 border-red-200"
+  };
+  
+  return (
+    <span className={`px-2 py-1 text-xs rounded-full border ${variantStyles[variant]}`}>
+      {label}
+    </span>
+  );
+}
+
+// Helper functions
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B';
+  else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+  else return (bytes / 1073741824).toFixed(1) + ' GB';
 }

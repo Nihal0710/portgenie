@@ -15,6 +15,8 @@ import { uploadJSONToIPFS, uploadFileToIPFS } from "@/lib/pinata";
 import { createPortfolio, getPortfolios, getUserProfile } from "@/lib/supabase";
 import { verifyPortfolio } from "@/lib/ethereum";
 import { extractGitHubProfile } from "@/lib/gemini";
+import { ContentImprover } from "@/components/portfolio/content-improver";
+import { ContentImprovementProvider } from "@/components/providers/content-improvement-provider";
 
 interface PortfolioData {
   title: string;
@@ -384,352 +386,378 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div className="container py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Portfolio Builder</h1>
-        <p className="text-muted-foreground mt-1">
-          Create, manage, and share your professional portfolio
-        </p>
-      </div>
+    <ContentImprovementProvider initialUserData={userProfile}>
+      <div className="container py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">Portfolio Builder</h1>
+          <p className="text-muted-foreground mt-1">
+            Create, manage, and share your professional portfolio
+          </p>
+        </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2 mb-8">
-          <TabsTrigger value="list">My Portfolios</TabsTrigger>
-          <TabsTrigger value="create">Create Portfolio</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="list" className="space-y-4">
-          {portfolios.length === 0 ? (
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="list">My Portfolios</TabsTrigger>
+            <TabsTrigger value="create">Create Portfolio</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="list" className="space-y-4">
+            {portfolios.length === 0 ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>No Portfolios Found</CardTitle>
+                  <CardDescription>
+                    You haven't created any portfolios yet. Get started by creating your first portfolio.
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter>
+                  <Button onClick={() => setActiveTab("create")}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Portfolio
+                  </Button>
+                </CardFooter>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {portfolios.map((portfolio) => (
+                  <Card key={portfolio.id} className="overflow-hidden">
+                    <div className="aspect-video bg-muted relative">
+                      {portfolio.content.profile_image ? (
+                        <img 
+                          src={`https://gateway.pinata.cloud/ipfs/${portfolio.content.profile_image}`}
+                          alt={portfolio.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <ImageIcon className="h-12 w-12 text-muted-foreground/40" />
+                        </div>
+                      )}
+                    </div>
+                    <CardHeader>
+                      <CardTitle>{portfolio.title}</CardTitle>
+                      <CardDescription>
+                        Created on {new Date(portfolio.created_at).toLocaleDateString()}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                        {portfolio.description || "No description provided"}
+                      </p>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <CheckCircle2 className="mr-2 h-4 w-4 text-green-500" />
+                        Stored on IPFS
+                      </div>
+                      {portfolio.blockchain_verification_tx && (
+                        <div className="flex items-center text-sm text-muted-foreground mt-1">
+                          <CheckCircle2 className="mr-2 h-4 w-4 text-blue-500" />
+                          Blockchain Verified
+                        </div>
+                      )}
+                    </CardContent>
+                    <CardFooter className="flex justify-between">
+                      <Button variant="outline" asChild>
+                        <a href={`/portfolio/${portfolio.id}`} target="_blank">
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          View
+                        </a>
+                      </Button>
+                      {!portfolio.blockchain_verification_tx && (
+                        <Button 
+                          variant="secondary"
+                          onClick={() => handleVerifyPortfolio(portfolio)}
+                          disabled={verifying}
+                        >
+                          {verifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          Verify
+                        </Button>
+                      )}
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="create">
             <Card>
               <CardHeader>
-                <CardTitle>No Portfolios Found</CardTitle>
+                <CardTitle>Create New Portfolio</CardTitle>
                 <CardDescription>
-                  You haven't created any portfolios yet. Get started by creating your first portfolio.
+                  Build your professional portfolio to showcase your skills and projects
                 </CardDescription>
               </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="portfolioTitle">Portfolio Title</Label>
+                    <Input
+                      id="portfolioTitle"
+                      placeholder="My Professional Portfolio"
+                      value={portfolioData.title}
+                      onChange={(e) => handleInputChange('title', e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="portfolioTheme">Theme</Label>
+                    <Select 
+                      value={portfolioData.theme} 
+                      onValueChange={(value) => handleInputChange('theme', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a theme" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="modern">Modern</SelectItem>
+                        <SelectItem value="classic">Classic</SelectItem>
+                        <SelectItem value="minimal">Minimal</SelectItem>
+                        <SelectItem value="dark">Dark</SelectItem>
+                        <SelectItem value="colorful">Colorful</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="portfolioDescription">Description</Label>
+                  <Textarea
+                    id="portfolioDescription"
+                    placeholder="A brief description of your portfolio..."
+                    value={portfolioData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                  />
+                  <ContentImprover 
+                    sectionType="description"
+                    currentContent={portfolioData.description}
+                    onSelectImprovement={(content) => handleInputChange('description', content)}
+                    userData={userProfile}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="portfolioAbout">About Me</Label>
+                  <Textarea
+                    id="portfolioAbout"
+                    placeholder="Tell visitors about yourself and your background..."
+                    className="min-h-[120px]"
+                    value={portfolioData.about}
+                    onChange={(e) => handleInputChange('about', e.target.value)}
+                  />
+                  <ContentImprover 
+                    sectionType="about"
+                    currentContent={portfolioData.about}
+                    onSelectImprovement={(content) => handleInputChange('about', content)}
+                    userData={userProfile}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="portfolioSkills">Skills (comma separated)</Label>
+                  <Textarea
+                    id="portfolioSkills"
+                    placeholder="React, JavaScript, Node.js, CSS, HTML..."
+                    value={portfolioData.skills}
+                    onChange={(e) => handleInputChange('skills', e.target.value)}
+                  />
+                  <ContentImprover 
+                    sectionType="skills"
+                    currentContent={portfolioData.skills}
+                    onSelectImprovement={(content) => handleInputChange('skills', content)}
+                    userData={userProfile}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="profileImage">Profile Image</Label>
+                  <Input
+                    id="profileImage"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfileImageChange}
+                  />
+                </div>
+                
+                <div className="space-y-4 pt-4">
+                  <h3 className="text-lg font-medium">Projects</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Showcase your projects and achievements
+                  </p>
+                  
+                  <div className="space-y-6">
+                    {portfolioData.projects.map((project: any, index: number) => (
+                      <div key={index} className="border rounded-md p-4 space-y-4">
+                        <div className="flex justify-between items-center">
+                          <h4 className="font-medium">Project {index + 1}</h4>
+                          {portfolioData.projects.length > 1 && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleRemoveProject(index)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          )}
+                        </div>
+                        
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor={`project-${index}-title`}>Title</Label>
+                            <Input
+                              id={`project-${index}-title`}
+                              placeholder="Project Title"
+                              value={project.title}
+                              onChange={(e) => handleProjectChange(index, 'title', e.target.value)}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor={`project-${index}-description`}>Description</Label>
+                            <Textarea
+                              id={`project-${index}-description`}
+                              placeholder="Describe your project..."
+                              value={project.description}
+                              onChange={(e) => handleProjectChange(index, 'description', e.target.value)}
+                            />
+                            <ContentImprover 
+                              sectionType="project"
+                              currentContent={project.description}
+                              onSelectImprovement={(content) => handleProjectChange(index, 'description', content)}
+                              userData={userProfile}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor={`project-${index}-technologies`}>Technologies (comma separated)</Label>
+                            <Input
+                              id={`project-${index}-technologies`}
+                              placeholder="React, Node.js, MongoDB..."
+                              value={project.technologies}
+                              onChange={(e) => handleProjectChange(index, 'technologies', e.target.value)}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor={`project-${index}-github`}>GitHub URL</Label>
+                            <Input
+                              id={`project-${index}-github`}
+                              placeholder="https://github.com/username/project"
+                              value={project.github_url}
+                              onChange={(e) => handleProjectChange(index, 'github_url', e.target.value)}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor={`project-${index}-image`}>Project Image</Label>
+                            <Input
+                              id={`project-${index}-image`}
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleProjectImageChange(index, e)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <Button variant="outline" size="sm" onClick={handleAddProject}>
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Project
+                  </Button>
+                </div>
+                
+                <div className="space-y-4 pt-4">
+                  <h3 className="text-lg font-medium">Contact Information</h3>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="contactEmail">Email</Label>
+                    <Input
+                      id="contactEmail"
+                      placeholder="your.email@example.com"
+                      value={portfolioData.contact_email}
+                      onChange={(e) => handleInputChange('contact_email', e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-4 pt-2">
+                    <h4 className="text-md font-medium">Social Links</h4>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-4">
+                        <Github className="h-5 w-5" />
+                        <div className="flex-1">
+                          <Input
+                            placeholder="GitHub Profile URL"
+                            value={portfolioData.social_links.github}
+                            onChange={(e) => handleSocialLinkChange('github', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-4">
+                        <Linkedin className="h-5 w-5 text-blue-600" />
+                        <div className="flex-1">
+                          <Input
+                            placeholder="LinkedIn Profile URL"
+                            value={portfolioData.social_links.linkedin}
+                            onChange={(e) => handleSocialLinkChange('linkedin', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400">
+                          <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+                        </svg>
+                        <div className="flex-1">
+                          <Input
+                            placeholder="Twitter/X Profile URL"
+                            value={portfolioData.social_links.twitter}
+                            onChange={(e) => handleSocialLinkChange('twitter', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="text-lg font-medium">Import from GitHub</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Automatically import your projects and skills from GitHub
+                  </p>
+                  
+                  <div className="flex space-x-2">
+                    <Input
+                      placeholder="GitHub Profile URL"
+                      value={githubUrl}
+                      onChange={(e) => setGithubUrl(e.target.value)}
+                    />
+                    <Button 
+                      variant="outline"
+                      onClick={handleImportFromGithub}
+                      disabled={processingAI || !githubUrl}
+                    >
+                      {processingAI && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Import
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
               <CardFooter>
-                <Button onClick={() => setActiveTab("create")}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Portfolio
+                <Button 
+                  onClick={handleCreatePortfolio}
+                  disabled={uploadingIPFS || !portfolioData.title}
+                >
+                  {uploadingIPFS && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {uploadingIPFS ? "Creating..." : "Create Portfolio"}
                 </Button>
               </CardFooter>
             </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {portfolios.map((portfolio) => (
-                <Card key={portfolio.id} className="overflow-hidden">
-                  <div className="aspect-video bg-muted relative">
-                    {portfolio.content.profile_image ? (
-                      <img 
-                        src={`https://gateway.pinata.cloud/ipfs/${portfolio.content.profile_image}`}
-                        alt={portfolio.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <ImageIcon className="h-12 w-12 text-muted-foreground/40" />
-                      </div>
-                    )}
-                  </div>
-                  <CardHeader>
-                    <CardTitle>{portfolio.title}</CardTitle>
-                    <CardDescription>
-                      Created on {new Date(portfolio.created_at).toLocaleDateString()}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {portfolio.description || "No description provided"}
-                    </p>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <CheckCircle2 className="mr-2 h-4 w-4 text-green-500" />
-                      Stored on IPFS
-                    </div>
-                    {portfolio.blockchain_verification_tx && (
-                      <div className="flex items-center text-sm text-muted-foreground mt-1">
-                        <CheckCircle2 className="mr-2 h-4 w-4 text-blue-500" />
-                        Blockchain Verified
-                      </div>
-                    )}
-                  </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <Button variant="outline" asChild>
-                      <a href={`/portfolio/${portfolio.id}`} target="_blank">
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        View
-                      </a>
-                    </Button>
-                    {!portfolio.blockchain_verification_tx && (
-                      <Button 
-                        variant="secondary"
-                        onClick={() => handleVerifyPortfolio(portfolio)}
-                        disabled={verifying}
-                      >
-                        {verifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Verify
-                      </Button>
-                    )}
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="create">
-          <Card>
-            <CardHeader>
-              <CardTitle>Create New Portfolio</CardTitle>
-              <CardDescription>
-                Build your professional portfolio to showcase your skills and projects
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="portfolioTitle">Portfolio Title</Label>
-                  <Input
-                    id="portfolioTitle"
-                    placeholder="My Professional Portfolio"
-                    value={portfolioData.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="portfolioTheme">Theme</Label>
-                  <Select 
-                    value={portfolioData.theme} 
-                    onValueChange={(value) => handleInputChange('theme', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a theme" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="modern">Modern</SelectItem>
-                      <SelectItem value="classic">Classic</SelectItem>
-                      <SelectItem value="minimal">Minimal</SelectItem>
-                      <SelectItem value="dark">Dark</SelectItem>
-                      <SelectItem value="colorful">Colorful</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="portfolioDescription">Description</Label>
-                <Textarea
-                  id="portfolioDescription"
-                  placeholder="A brief description of your portfolio..."
-                  value={portfolioData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="portfolioAbout">About Me</Label>
-                <Textarea
-                  id="portfolioAbout"
-                  placeholder="Tell visitors about yourself and your background..."
-                  className="min-h-[120px]"
-                  value={portfolioData.about}
-                  onChange={(e) => handleInputChange('about', e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="portfolioSkills">Skills (comma separated)</Label>
-                <Textarea
-                  id="portfolioSkills"
-                  placeholder="React, JavaScript, Node.js, CSS, HTML..."
-                  value={portfolioData.skills}
-                  onChange={(e) => handleInputChange('skills', e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="profileImage">Profile Image</Label>
-                <Input
-                  id="profileImage"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleProfileImageChange}
-                />
-              </div>
-              
-              <div className="space-y-4 pt-4">
-                <h3 className="text-lg font-medium">Projects</h3>
-                <p className="text-sm text-muted-foreground">
-                  Showcase your projects and achievements
-                </p>
-                
-                <div className="space-y-6">
-                  {portfolioData.projects.map((project: any, index: number) => (
-                    <div key={index} className="border rounded-md p-4 space-y-4">
-                      <div className="flex justify-between items-center">
-                        <h4 className="font-medium">Project {index + 1}</h4>
-                        {portfolioData.projects.length > 1 && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleRemoveProject(index)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        )}
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor={`project-${index}-title`}>Title</Label>
-                          <Input
-                            id={`project-${index}-title`}
-                            placeholder="Project Title"
-                            value={project.title}
-                            onChange={(e) => handleProjectChange(index, 'title', e.target.value)}
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor={`project-${index}-description`}>Description</Label>
-                          <Textarea
-                            id={`project-${index}-description`}
-                            placeholder="Describe your project..."
-                            value={project.description}
-                            onChange={(e) => handleProjectChange(index, 'description', e.target.value)}
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor={`project-${index}-technologies`}>Technologies (comma separated)</Label>
-                          <Input
-                            id={`project-${index}-technologies`}
-                            placeholder="React, Node.js, MongoDB..."
-                            value={project.technologies}
-                            onChange={(e) => handleProjectChange(index, 'technologies', e.target.value)}
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor={`project-${index}-github`}>GitHub URL</Label>
-                          <Input
-                            id={`project-${index}-github`}
-                            placeholder="https://github.com/username/project"
-                            value={project.github_url}
-                            onChange={(e) => handleProjectChange(index, 'github_url', e.target.value)}
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor={`project-${index}-image`}>Project Image</Label>
-                          <Input
-                            id={`project-${index}-image`}
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleProjectImageChange(index, e)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                <Button variant="outline" size="sm" onClick={handleAddProject}>
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add Project
-                </Button>
-              </div>
-              
-              <div className="space-y-4 pt-4">
-                <h3 className="text-lg font-medium">Contact Information</h3>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="contactEmail">Email</Label>
-                  <Input
-                    id="contactEmail"
-                    placeholder="your.email@example.com"
-                    value={portfolioData.contact_email}
-                    onChange={(e) => handleInputChange('contact_email', e.target.value)}
-                  />
-                </div>
-                
-                <div className="space-y-4 pt-2">
-                  <h4 className="text-md font-medium">Social Links</h4>
-                  
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-4">
-                      <Github className="h-5 w-5" />
-                      <div className="flex-1">
-                        <Input
-                          placeholder="GitHub Profile URL"
-                          value={portfolioData.social_links.github}
-                          onChange={(e) => handleSocialLinkChange('github', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-4">
-                      <Linkedin className="h-5 w-5 text-blue-600" />
-                      <div className="flex-1">
-                        <Input
-                          placeholder="LinkedIn Profile URL"
-                          value={portfolioData.social_links.linkedin}
-                          onChange={(e) => handleSocialLinkChange('linkedin', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400">
-                        <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
-                      </svg>
-                      <div className="flex-1">
-                        <Input
-                          placeholder="Twitter/X Profile URL"
-                          value={portfolioData.social_links.twitter}
-                          onChange={(e) => handleSocialLinkChange('twitter', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-4 pt-4 border-t">
-                <h3 className="text-lg font-medium">Import from GitHub</h3>
-                <p className="text-sm text-muted-foreground">
-                  Automatically import your projects and skills from GitHub
-                </p>
-                
-                <div className="flex space-x-2">
-                  <Input
-                    placeholder="GitHub Profile URL"
-                    value={githubUrl}
-                    onChange={(e) => setGithubUrl(e.target.value)}
-                  />
-                  <Button 
-                    variant="outline"
-                    onClick={handleImportFromGithub}
-                    disabled={processingAI || !githubUrl}
-                  >
-                    {processingAI && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Import
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                onClick={handleCreatePortfolio}
-                disabled={uploadingIPFS || !portfolioData.title}
-              >
-                {uploadingIPFS && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {uploadingIPFS ? "Creating..." : "Create Portfolio"}
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </ContentImprovementProvider>
   );
 }
