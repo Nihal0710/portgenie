@@ -11,7 +11,7 @@ export default function DashboardLayout({
     <div className="flex min-h-screen">
       <DashboardSidebar />
       <SidebarInset className="bg-background">
-        <div className="container py-6 md:py-8">{children}</div>
+        <div className="container py-6 mt-[-7vh] md:py-8">{children}</div>
       </SidebarInset>
     </div>
   )

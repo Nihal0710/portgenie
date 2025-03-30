@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Check, AlertTriangle, ExternalLink, Info, Shield, Wallet } from 'lucide-react';
+import { Check, AlertTriangle, ExternalLink, Info, Shield, Wallet, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { getConnectedWallet, verifyCertificateOwnership, getNFTMetadata } from '@/lib/web3';
@@ -112,25 +112,108 @@ export default function Web3Verification({
 
   // For the specific hash in the request
   useEffect(() => {
-    if (ipfsHash === 'bafybeidqvihld4k77iqe2qiiu5ajlktcxvswbj7eivplh3tm2tedrlzeym') {
-      // Mock verification for the specific hash
-      setVerification({
-        success: true,
-        isOwner: true,
-        owner: "0x1234...5678",
-        expectedOwner: "0x1234...5678"
-      });
-      
-      // Mock metadata
-      setMetadata({
-        name: "PortGenie Portfolio Certificate",
-        description: "This certificate verifies the authenticity of the linked portfolio",
-        portfolio_url: "https://portgenie.com/portfolio/john-doe",
-        issued_date: new Date().toISOString(),
-        blockchain: "ethereum"
-      });
+    // Remove mock implementation and replace with real verification
+    if (ipfsHash && wallet?.address) {
+      // Automatically verify if we have both wallet and ipfsHash
+      if (contractAddress && tokenId) {
+        verifyOwnership();
+      }
     }
-  }, [ipfsHash]);
+  }, [ipfsHash, wallet?.address]);
+  
+  // Mint NFT if not already minted
+  const mintNFT = async () => {
+    if (!wallet) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+    
+    setIsVerifying(true);
+    setError(null);
+    
+    try {
+      // Call the appropriate mint function based on entityType
+      let mintResult;
+      
+      if (entityType === 'portfolio') {
+        const { mintPortfolioNFT } = await import('@/lib/web3');
+        mintResult = await mintPortfolioNFT(
+          wallet.address, // Use as userId temporarily
+          entityId || 'default-portfolio',
+          {
+            title: 'My Professional Portfolio',
+            description: 'Web3 verified professional portfolio showcasing my work and skills',
+            thumbnail_url: window.location.origin + '/portfolio-thumbnail.png',
+            portfolio_url: window.location.href,
+          },
+          process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS || '0x1234567890123456789012345678901234567890'
+        );
+      } else if (entityType === 'resume') {
+        const { mintResumeNFT } = await import('@/lib/web3');
+        mintResult = await mintResumeNFT(
+          wallet.address, // Use as userId temporarily
+          entityId || 'default-resume',
+          {
+            title: 'My Professional Resume',
+            description: 'Web3 verified professional resume',
+            content: 'Resume content hash: ' + ipfsHash,
+            template: 'Professional',
+          },
+          process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS || '0x1234567890123456789012345678901234567890'
+        );
+      } else {
+        const { mintCertificateNFT } = await import('@/lib/web3');
+        mintResult = await mintCertificateNFT(
+          wallet.address, // Use as userId temporarily
+          entityId || 'default-certificate',
+          {
+            title: 'PortGenie Verification Certificate',
+            description: 'This certificate verifies the authenticity of the linked content',
+            thumbnail_url: window.location.origin + '/certificate-thumbnail.png',
+            issuer: 'PortGenie Platform',
+            issue_date: new Date().toISOString(),
+            credential_id: ipfsHash,
+            credential_url: window.location.href,
+          },
+          process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS || '0x1234567890123456789012345678901234567890'
+        );
+      }
+      
+      // Set the verification and metadata
+      if (mintResult.success) {
+        setVerification({
+          success: true,
+          isOwner: true,
+          owner: wallet.address,
+          expectedOwner: wallet.address
+        });
+        
+        // Get NFT metadata
+        try {
+          const metadataResult = await getNFTMetadata(
+            mintResult.web3Credential.contract_address,
+            mintResult.web3Credential.token_id
+          );
+          setMetadata(metadataResult.metadata);
+        } catch (metadataErr) {
+          console.error('Error fetching NFT metadata:', metadataErr);
+        }
+        
+        // Set contractAddress and tokenId from mint result
+        // Note: This would normally be saved to the database and retrieved
+        toast.success('Successfully minted and verified on blockchain!');
+      }
+    } catch (err: any) {
+      console.error('Error minting NFT:', err);
+      setError(err.message || 'Failed to mint NFT');
+      toast.error(err.message || 'Failed to mint NFT');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+  
+  // When a connected wallet has a verification in progress
+  const isVerificationInProgress = wallet && !verification && !error;
   
   return (
     <div className="space-y-6">
@@ -164,7 +247,7 @@ export default function Web3Verification({
                 </div>
               </div>
               
-              {contractAddress && tokenId && (
+              {contractAddress && tokenId ? (
                 <div className="space-y-4">
                   <div>
                     <span className="text-sm font-medium">Smart Contract</span>
@@ -216,7 +299,47 @@ export default function Web3Verification({
                     </div>
                   )}
                 </div>
-              )}
+              ) : isVerificationInProgress ? (
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-sm font-medium">IPFS Hash</span>
+                    <p className="text-xs font-mono mt-1 text-muted-foreground truncate">
+                      {ipfsHash}
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-col items-center justify-center py-4">
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertTitle>Not Yet On Blockchain</AlertTitle>
+                      <AlertDescription className="text-xs">
+                        This {renderEntityType().toLowerCase()} has been stored on IPFS but not yet minted as an NFT.
+                      </AlertDescription>
+                    </Alert>
+                    
+                    <Button 
+                      onClick={mintNFT} 
+                      className="mt-4 gap-2"
+                      disabled={isVerifying}
+                    >
+                      {isVerifying ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Minting...
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="h-4 w-4" />
+                          Mint as NFT
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
               
               {error && (
                 <Alert variant="destructive">
@@ -251,33 +374,38 @@ export default function Web3Verification({
               disabled={isVerifying}
               className="gap-2"
             >
-              <Shield className="h-4 w-4" />
-              {isVerifying ? 'Verifying...' : 'Verify Ownership'}
+              {isVerifying ? (
+                <>
+                  <svg className="animate-spin h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Verifying...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-4 w-4" />
+                  Refresh Verification
+                </>
+              )}
             </Button>
-            
-            <Button
-              variant="default"
-              asChild
-              className="gap-2"
-            >
-              <a 
-                href={`https://etherscan.io/address/${contractAddress}`} 
-                target="_blank" 
+            {verification?.isOwner && (
+              <a
+                href={`https://etherscan.io/token/${contractAddress}?a=${tokenId}`}
+                target="_blank"
                 rel="noopener noreferrer"
               >
-                <ExternalLink className="h-4 w-4" />
-                View on Etherscan
+                <Button variant="ghost" className="gap-2">
+                  <ExternalLink className="h-4 w-4" />
+                  View on Blockchain
+                </Button>
               </a>
-            </Button>
+            )}
           </CardFooter>
         )}
       </Card>
       
-      <IPFSVerification 
-        ipfsHash={ipfsHash}
-        entityType={entityType}
-        entityId={entityId}
-      />
+      <IPFSVerification ipfsHash={ipfsHash} />
     </div>
   );
 } 

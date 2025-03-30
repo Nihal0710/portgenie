@@ -122,22 +122,29 @@ export function WalletConnect({ className, onWalletChange }: WalletConnectProps)
     if (!user) return;
     
     try {
-      const profile = await getUserProfile(user.id);
+      const userProfileData = await getUserProfile(user.id);
       
-      if (profile) {
-        if (profile.wallet_address !== walletAddress) {
-          await updateUserProfile(user.id, { wallet_address: walletAddress });
-        }
-      } else {
-        // Create profile with wallet address if it doesn't exist
-        await updateUserProfile(user.id, { 
-          wallet_address: walletAddress,
-          full_name: user.fullName || '',
-          email: user.primaryEmailAddress?.emailAddress || ''
-        });
-      }
+      // Always update the user's wallet address
+      await updateUserProfile(user.id, { 
+        wallet_address: walletAddress,
+        // Preserve existing profile data
+        full_name: user.fullName || '',
+        email: user.primaryEmailAddress?.emailAddress || ''
+      });
+      
+      toast({
+        title: "Wallet Saved",
+        description: "Your wallet address has been saved to your profile",
+        duration: 3000,
+      });
     } catch (error) {
       console.error("Error saving wallet address to profile:", error);
+      toast({
+        title: "Profile Update Failed",
+        description: "Could not save wallet address to your profile",
+        variant: "destructive",
+        duration: 3000,
+      });
     }
   };
   

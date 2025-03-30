@@ -64,6 +64,7 @@ CREATE TABLE profiles (
   languages TEXT[],
   interests TEXT[],
   custom_fields JSONB,
+  settings JSONB DEFAULT '{}',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

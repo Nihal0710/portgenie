@@ -1,66 +1,117 @@
+#!/usr/bin/env python3
+
 import os
-import mimetypes
+import sys
+import json
+import google.generativeai as genai
+from PIL import Image
+import requests
+from io import BytesIO
 import base64
-from google import genai
-from google.genai import types
+import re
 
+# Configure the Google Generative AI client
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    print("Error: GEMINI_API_KEY environment variable not set")
+    sys.exit(1)
 
-def save_binary_file(file_name, data):
-    f = open(file_name, "wb")
-    f.write(data)
-    f.close()
+genai.configure(api_key=api_key)
 
-
-def generate_image(prompt, output_file="generated_image"):
-    client = genai.Client(
-        api_key=os.environ.get("GEMINI_API_KEY"),
-    )
-
-    model = "gemini-2.0-flash-exp-image-generation"
-    contents = [
-        types.Content(
-            role="user",
-            parts=[
-                types.Part.from_text(text=prompt),
-            ],
-        ),
-    ]
-    generate_content_config = types.GenerateContentConfig(
-        response_modalities=[
-            "image",
-            "text",
-        ],
-        response_mime_type="text/plain",
-    )
-
-    for chunk in client.models.generate_content_stream(
-        model=model,
-        contents=contents,
-        config=generate_content_config,
-    ):
-        if not chunk.candidates or not chunk.candidates[0].content or not chunk.candidates[0].content.parts:
-            continue
-        if chunk.candidates[0].content.parts[0].inline_data:
-            file_name = output_file
-            inline_data = chunk.candidates[0].content.parts[0].inline_data
-            file_extension = mimetypes.guess_extension(inline_data.mime_type)
-            save_binary_file(
-                f"{file_name}{file_extension}", inline_data.data
-            )
-            print(
-                "File of mime type"
-                f" {inline_data.mime_type} saved"
-                f" to: {file_name}{file_extension}"
-            )
-            return f"{file_name}{file_extension}", inline_data.mime_type
-        else:
-            print(chunk.text)
+def extract_image_url(text):
+    """Extract image URL from model response text."""
+    # Look for markdown image syntax
+    pattern = r'!\[.*?\]\((.*?)\)'
+    match = re.search(pattern, text)
+    if match:
+        return match.group(1)
     
-    return None, None
+    # Look for direct URLs
+    url_pattern = r'https?://\S+\.(?:jpg|jpeg|png|gif|webp)'
+    match = re.search(url_pattern, text)
+    if match:
+        return match.group(0)
+    
+    return None
+
+def save_image_from_url(url, output_path):
+    """Download and save image from URL."""
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+        
+        # Determine file extension
+        content_type = response.headers.get('content-type', '')
+        ext = content_type.split('/')[-1]
+        if ext not in ['jpeg', 'jpg', 'png', 'gif', 'webp']:
+            ext = 'png'  # Default
+        
+        final_path = f"{output_path}.{ext}"
+        
+        img = Image.open(BytesIO(response.content))
+        img.save(final_path)
+        print(f"Image saved to: {final_path}")
+        return final_path
+    except Exception as e:
+        print(f"Error saving image: {e}")
+        return None
+
+def generate_image(prompt):
+    """Generate an image using Gemini."""
+    try:
+        # Use Gemini 1.5 Pro for image generation
+        model = genai.GenerativeModel('gemini-1.5-pro')
+        
+        # Generate image
+        response = model.generate_content(
+            f"""Create a high-quality image based on this description: {prompt}
+            Please generate a detailed, professional-looking image that would be suitable for a portfolio or resume website.
+            Respond with the image only, no text."""
+        )
+        
+        # Extract image URL from response
+        image_url = extract_image_url(response.text)
+        
+        if not image_url:
+            print("No image URL found in the response.")
+            return None
+            
+        return image_url
+    except Exception as e:
+        print(f"Error generating image: {e}")
+        return None
+
+def main():
+    print("Enter image generation prompt:")
+    prompt = input().strip()
+    
+    if not prompt:
+        print("Error: Empty prompt")
+        sys.exit(1)
+    
+    print(f"Generating image for: {prompt}")
+    image_url = generate_image(prompt)
+    
+    if not image_url:
+        print("Failed to generate image")
+        sys.exit(1)
+    
+    print("Enter output filename (without extension):")
+    output_path = input().strip()
+    
+    if not output_path:
+        print("Error: Empty filename")
+        sys.exit(1)
+    
+    final_path = save_image_from_url(image_url, output_path)
+    
+    if final_path:
+        # Return file path to Node.js
+        print(f"Image successfully generated and saved to: {final_path}")
+        sys.exit(0)
+    else:
+        print("Failed to save image")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    prompt = input("Enter image generation prompt: ")
-    output_file = input("Enter output filename (without extension): ")
-    if not output_file:
-        output_file = "generated_image"
-    generate_image(prompt, output_file) 
+    main() 

@@ -12,26 +12,86 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 // User Profile Functions
 export async function getUserProfile(userId: string) {
   try {
-    const { data, error } = await supabase
+    // First check if the user exists
+    const { data: userData, error: userError } = await supabase
       .from('users')
-      .select(`
-        *,
-        profiles(*)
-      `)
+      .select('*')
       .eq('id', userId)
       .single();
 
-    if (error) throw error;
-    return data;
+    if (userError) throw userError;
+
+    // Then check for profile data
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    // We ignore profile error since profile might not exist yet
+    
+    // Combine the data
+    return {
+      ...userData,
+      profile: profileData || {}
+    };
   } catch (error) {
     console.error('Error fetching user profile:', error);
     throw error;
   }
 }
 
+export async function updateUserSettings(userId: string, settingsData: any) {
+  try {
+    // First, check if the user exists
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', userId)
+      .single();
+
+    if (userError) throw userError;
+
+    // Update or insert settings in profiles table
+    const { data: profileData, error: profileFetchError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId);
+
+    if (profileFetchError) throw profileFetchError;
+
+    if (profileData && profileData.length > 0) {
+      // Profile exists, update settings
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          settings: settingsData
+        })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+    } else {
+      // Profile doesn't exist, create it with settings
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          settings: settingsData
+        });
+
+      if (insertError) throw insertError;
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating user settings:', error);
+    throw error;
+  }
+}
+
 export async function updateUserProfile(userId: string, userData: any) {
   try {
-    // Update users table
+    // Update users table with the fields that belong to users
     const { error: userError } = await supabase
       .from('users')
       .update({
@@ -44,6 +104,7 @@ export async function updateUserProfile(userId: string, userData: any) {
         github_username: userData.github_username,
         linkedin_username: userData.linkedin_username,
         twitter_username: userData.twitter_username,
+        wallet_address: userData.wallet_address, // Add wallet_address to users table
       })
       .eq('id', userId);
 
@@ -70,6 +131,7 @@ export async function updateUserProfile(userId: string, userData: any) {
           languages: userData.languages,
           interests: userData.interests,
           custom_fields: userData.custom_fields,
+          wallet_address: userData.wallet_address, // Also update in profiles if needed
         })
         .eq('id', userId);
 
@@ -89,6 +151,7 @@ export async function updateUserProfile(userId: string, userData: any) {
           languages: userData.languages,
           interests: userData.interests,
           custom_fields: userData.custom_fields,
+          wallet_address: userData.wallet_address, // Include in profile creation
         });
 
       if (profileError) throw profileError;
@@ -105,19 +168,19 @@ export async function updateUserProfile(userId: string, userData: any) {
 export async function getUserPortfolios(userId: string) {
   try {
     const { data, error } = await supabase
-      .from('portfolios')
-      .select(`
-        *,
-        projects(*)
-      `)
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .from("portfolios")
+      .select("*")
+      .eq("user_id", userId);
 
-    if (error) throw error;
+    if (error) {
+      console.error("Error fetching user portfolios:", error);
+      return [];
+    }
+
     return data || [];
   } catch (error) {
-    console.error('Error fetching user portfolios:', error);
-    throw error;
+    console.error("Error in getUserPortfolios:", error);
+    return [];
   }
 }
 
@@ -168,16 +231,19 @@ export async function createPortfolio(userId: string, portfolioData: any) {
 export async function getUserResumes(userId: string) {
   try {
     const { data, error } = await supabase
-      .from('resumes')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .from("resumes")
+      .select("*")
+      .eq("user_id", userId);
 
-    if (error) throw error;
+    if (error) {
+      console.error("Error fetching user resumes:", error);
+      return [];
+    }
+
     return data || [];
   } catch (error) {
-    console.error('Error fetching user resumes:', error);
-    throw error;
+    console.error("Error in getUserResumes:", error);
+    return [];
   }
 }
 
@@ -408,5 +474,186 @@ export async function getUserAiImages(userId: string) {
   } catch (error) {
     console.error('Error fetching user AI images:', error);
     throw error;
+  }
+}
+
+// Video generation types
+export type VideoGeneration = {
+  id: string;
+  title: string;
+  description?: string;
+  video_url?: string;
+  audio_url?: string;
+  script?: string;
+  video_type: 'portfolio' | 'resume';
+  portfolio_id?: string;
+  resume_id?: string;
+  voice_style: string;
+  theme: string;
+  music_style: string;
+  duration: number;
+  status: 'pending' | 'generating' | 'completed' | 'error';
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Get all video generations for a user
+ * @param userId The user's ID
+ * @returns Array of user video generations
+ */
+export async function getUserVideoGenerations(userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("video_generations")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching user video generations:", error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error("Error in getUserVideoGenerations:", error);
+    return [];
+  }
+}
+
+/**
+ * Get a video generation by ID
+ * @param videoId The video generation ID
+ * @param userId The user's ID (for authorization)
+ * @returns The video generation or null if not found
+ */
+export async function getVideoGenerationById(videoId: string, userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("video_generations")
+      .select("*")
+      .eq("id", videoId)
+      .eq("user_id", userId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching video generation:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error in getVideoGenerationById:", error);
+    return null;
+  }
+}
+
+/**
+ * Create a new video generation
+ * @param userId The user's ID
+ * @param videoData The video generation data
+ * @returns The created video generation or null if failed
+ */
+export async function createVideoGeneration(userId: string, videoData: Partial<VideoGeneration>) {
+  try {
+    const { data, error } = await supabase
+      .from("video_generations")
+      .insert([{
+        user_id: userId,
+        ...videoData
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error creating video generation:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error in createVideoGeneration:", error);
+    return null;
+  }
+}
+
+/**
+ * Update an existing video generation
+ * @param videoId The video generation ID
+ * @param userId The user's ID (for authorization)
+ * @param videoData The updated video generation data
+ * @returns The updated video generation or null if failed
+ */
+export async function updateVideoGeneration(videoId: string, userId: string, videoData: Partial<VideoGeneration>) {
+  try {
+    const { data, error } = await supabase
+      .from("video_generations")
+      .update(videoData)
+      .eq("id", videoId)
+      .eq("user_id", userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error updating video generation:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error in updateVideoGeneration:", error);
+    return null;
+  }
+}
+
+/**
+ * Delete a video generation
+ * @param videoId The video generation ID
+ * @param userId The user's ID (for authorization)
+ * @returns True if successful, false otherwise
+ */
+export async function deleteVideoGeneration(videoId: string, userId: string) {
+  try {
+    const { error } = await supabase
+      .from("video_generations")
+      .delete()
+      .eq("id", videoId)
+      .eq("user_id", userId);
+
+    if (error) {
+      console.error("Error deleting video generation:", error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error in deleteVideoGeneration:", error);
+    return false;
+  }
+}
+
+/**
+ * Get video generation statistics for a user
+ * @param userId The user's ID
+ * @returns Video generation statistics or null if failed
+ */
+export async function getUserVideoStats(userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("video_generation_stats")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching video generation stats:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error in getUserVideoStats:", error);
+    return null;
   }
 }

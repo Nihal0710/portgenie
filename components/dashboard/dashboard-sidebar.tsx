@@ -20,6 +20,7 @@ import {
   Crown,
   FileEdit,
   ImageIcon,
+  Globe,
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useUser } from "@clerk/nextjs"
@@ -113,6 +114,11 @@ export function DashboardSidebar() {
       title: "Image Generator",
       href: "/dashboard/image-generator",
       icon: ImageIcon,
+    },
+    {
+      title: "Website Builder",
+      href: "/dashboard/resume-portfolio-builder",
+      icon: Globe,
     },
     {
       title: "Profile",

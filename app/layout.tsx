@@ -40,9 +40,9 @@ export default function RootLayout({
         <body className={`${inter.className}`}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <SidebarProvider>
-              <div className="flex min-h-screen w-full">
+              <div className="relative flex min-h-screen w-full overflow-hidden">
                 <Navbar />
-                <main className="flex-1 w-full mt-[-50px] pt-4">
+                <main className="flex-1 w-full pt-16">
                   {children}
                 </main>
               </div>

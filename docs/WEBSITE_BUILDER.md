@@ -1,60 +1,80 @@
-# AI Website Builder
+# Resume & Portfolio Website Builder Documentation
 
-The AI Website Builder is a powerful feature that allows users to generate custom websites with a live preview functionality. This tool leverages the Gemini API to create HTML, CSS, and JavaScript code based on user preferences and descriptions.
+## Overview
+
+The Resume & Portfolio Website Builder is a powerful tool within PortGenie that allows users to create professional websites to showcase their skills, experience, and projects. This feature leverages AI to generate personalized, responsive websites with minimal user input.
 
 ## Features
 
-- **Website Generation**: Create custom websites by describing what you want
-- **Live Preview**: See your website in real-time as you make changes
-- **Code Editor**: Edit HTML, CSS, and JavaScript directly
-- **Download**: Save your website as an HTML file
-- **Customization Options**: Choose website type, color scheme, and complexity
+- **Multiple Website Types**: Create resume websites, portfolio websites, or combined resume/portfolio sites
+- **Customizable Design**: Choose from various styles, layouts, and color themes
+- **Data Import**: Automatically import data from your existing PortGenie resume and portfolio
+- **Responsive Design**: All generated websites are fully responsive and work on all devices
+- **Section Selection**: Choose which specific sections to include in your website
+- **Custom Notes**: Add specific instructions for customization
+- **One-Click Publishing**: Easily publish your website with a single click
+- **Source Code Access**: Download the generated HTML, CSS, and JavaScript code
 
-## Setup Instructions
+## Getting Started
 
-1. **API Key Configuration**
-
-   Add your Google API key to the environment variables:
-
-   ```
-   GOOGLE_API_KEY=your_google_api_key
-   ```
-
-   You can obtain an API key from the [Google AI Studio](https://ai.google.dev/).
-
-2. **Install Dependencies**
-
-   Ensure you have the required dependencies installed:
-
-   ```bash
-   npm install @google/generative-ai
-   ```
-
-3. **Usage**
-
-   Navigate to the Website Builder section from the dashboard to start creating websites.
+1. Navigate to the Website Builder section in your PortGenie dashboard
+2. Fill out the website creation form:
+   - Enter a title for your website
+   - Select your desired website type (resume, portfolio, or both)
+   - Choose a style and color theme
+   - Select which data to import
+   - Choose your preferred layout
+   - Select the sections you want to include
+   - Add any custom notes or requirements
+3. Click "Generate Website" to create your site
+4. Preview your website once generation is complete
+5. Publish or download your website
 
 ## How It Works
 
-1. **User Input**: Users provide a description of their desired website, select a website type, color scheme, and complexity level.
+### Data Import and Analysis
 
-2. **AI Generation**: The system sends these preferences to the Gemini API, which generates HTML, CSS, and JavaScript code.
+The Website Builder extracts relevant information from your existing PortGenie data, including your resume, portfolio projects, skills, and personal information. This data is analyzed and structured to determine the optimal presentation in your website.
 
-3. **Live Preview**: The generated code is immediately displayed in a live preview iframe.
+### Design Generation
 
-4. **Customization**: Users can edit the code directly if needed and see changes reflected in real-time.
+Based on your style and layout preferences, our AI generates a custom design tailored to your content. This includes responsive layouts, typography selection, color schemes, and component styling.
 
-5. **Download**: The final website can be downloaded as a standalone HTML file that contains embedded CSS and JavaScript.
+### Code Generation
+
+The AI creates clean, optimized HTML, CSS, and JavaScript code that implements your website. This code follows modern web development best practices and ensures compatibility across browsers and devices.
+
+### Optimization and Accessibility
+
+Before finalizing your website, the system optimizes it for performance, SEO, and accessibility to ensure the best possible user experience for visitors to your site.
 
 ## Technical Implementation
 
-- **Frontend**: React components with Tabs, Cards, and form elements
-- **Backend**: API route that communicates with the Gemini API
-- **State Management**: React useState hooks for managing application state
-- **Preview**: Real-time preview using iframe with srcDoc attribute
+The Website Builder uses a combination of technologies:
+
+- **Frontend**: React components with form validation using React Hook Form and Zod
+- **Styling**: Tailwind CSS for responsive design
+- **Backend Processing**: Node.js with AI processing for design and code generation
+- **Hosting**: Integrated with serverless platforms for one-click publishing
+
+## Best Practices
+
+- **Complete Your Profile**: Ensure your PortGenie profile, resume, and portfolio are complete before generating a website for best results
+- **Choose Appropriate Sections**: Select sections that best showcase your specific skills and experience
+- **Customize Colors**: Choose a color theme that represents your personal brand
+- **Add Custom Notes**: If you have specific requirements, include them in the custom notes section
+- **Review Before Publishing**: Always preview your website thoroughly before publishing
 
 ## Limitations
 
-- The generated websites are standalone HTML files and don't include backend functionality
-- Complex interactive features might require additional manual coding
-- The API has token limits that may restrict extremely complex website generation 
+- Generation time may vary depending on the complexity of your data and selected options
+- While customizable, the websites follow structural templates to ensure professional quality
+- Very specialized layouts may require additional custom code modifications after generation
+
+## Tips for an Effective Website
+
+1. **Keep it concise**: Present your most relevant information prominently
+2. **Highlight key projects**: Showcase your best work with detailed descriptions
+3. **Include contact information**: Make it easy for potential employers to reach you
+4. **Maintain consistency**: Ensure your website's style matches your personal brand
+5. **Update regularly**: Keep your website current with your latest achievements and projects 
