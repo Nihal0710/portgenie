@@ -52,13 +52,13 @@ export function VideoPreview({ title, videoUrl, audioUrl, script }: VideoPreview
             </div>
             
             {/* Overlay controls */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
+            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
               <div className="flex items-center justify-between">
                 <Button 
                   variant="ghost" 
                   size="icon" 
                   onClick={togglePlay}
-                  className="text-white hover:text-white hover:bg-white/20"
+                  className="text-white hover:text-white hover:bg-white/30"
                 >
                   {playing ? 
                     <Pause className="h-5 w-5" /> : 
@@ -70,7 +70,7 @@ export function VideoPreview({ title, videoUrl, audioUrl, script }: VideoPreview
                   variant="ghost" 
                   size="icon" 
                   onClick={toggleMute}
-                  className="text-white hover:text-white hover:bg-white/20"
+                  className="text-white hover:text-white hover:bg-white/30"
                 >
                   {muted ? 
                     <VolumeX className="h-5 w-5" /> : 
@@ -84,7 +84,7 @@ export function VideoPreview({ title, videoUrl, audioUrl, script }: VideoPreview
         
         <TabsContent value="audio" className="mt-2">
           <div className="bg-muted rounded-lg p-6 flex flex-col items-center justify-center min-h-[200px]">
-            <div className="mb-4 opacity-70">
+            <div className="mb-4 opacity-80">
               <Volume2 className="h-12 w-12" />
             </div>
             <h3 className="font-medium text-lg mb-2">{title} - Audio</h3>

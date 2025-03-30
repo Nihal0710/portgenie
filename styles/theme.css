@@ -1,0 +1,82 @@
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+
+    /* Brand Colors with improved contrast */
+    --brand-blue: 222 76% 50%;
+    --brand-indigo: 243 75% 59%;
+    --brand-purple: 266 75% 55%;
+    --brand-pink: 330 81% 60%;
+    --brand-red: 0 84% 60%;
+    --brand-green: 142 71% 45%;
+    --brand-yellow: 38 92% 50%;
+
+    /* Hover states with deeper colors for contrast */
+    --brand-blue-hover: 222 76% 45%;
+    --brand-indigo-hover: 243 75% 50%;
+    --brand-purple-hover: 266 75% 50%;
+    --brand-pink-hover: 330 81% 55%;
+    --brand-red-hover: 0 84% 55%;
+    --brand-green-hover: 142 71% 40%;
+    --brand-yellow-hover: 38 92% 45%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+
+    /* Dark mode brand colors with better contrast */
+    --brand-blue: 214 100% 60%;
+    --brand-indigo: 243 75% 69%;
+    --brand-purple: 266 75% 65%;
+    --brand-pink: 330 81% 70%;
+    --brand-red: 0 84% 70%;
+    --brand-green: 142 71% 55%;
+    --brand-yellow: 38 92% 60%;
+
+    /* Dark mode hover states */
+    --brand-blue-hover: 214 100% 65%;
+    --brand-indigo-hover: 243 75% 74%;
+    --brand-purple-hover: 266 75% 70%;
+    --brand-pink-hover: 330 81% 75%;
+    --brand-red-hover: 0 84% 75%;
+    --brand-green-hover: 142 71% 60%;
+    --brand-yellow-hover: 38 92% 65%;
+  }
+} 

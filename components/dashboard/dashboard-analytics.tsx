@@ -163,7 +163,7 @@ export function DashboardAnalytics() {
             <CardDescription>Portfolio Views</CardDescription>
             <div className="flex items-baseline justify-between">
               <CardTitle className="text-2xl">1,247</CardTitle>
-              <Badge variant="default" className="bg-blue-500">
+              <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">
                 <ChevronUp className="mr-1 h-3 w-3" />
                 12%
               </Badge>
@@ -189,7 +189,7 @@ export function DashboardAnalytics() {
             <CardDescription>Application Rate</CardDescription>
             <div className="flex items-baseline justify-between">
               <CardTitle className="text-2xl">64</CardTitle>
-              <Badge variant="default" className="bg-purple-500">
+              <Badge variant="default" className="bg-purple-600 hover:bg-purple-700">
                 <TrendingUp className="mr-1 h-3 w-3" />
                 8%
               </Badge>
@@ -215,7 +215,7 @@ export function DashboardAnalytics() {
             <CardDescription>Response Rate</CardDescription>
             <div className="flex items-baseline justify-between">
               <CardTitle className="text-2xl">28%</CardTitle>
-              <Badge variant="default" className="bg-pink-500">
+              <Badge variant="default" className="bg-pink-600 hover:bg-pink-700">
                 <TrendingDown className="mr-1 h-3 w-3" />
                 2%
               </Badge>
@@ -235,7 +235,7 @@ export function DashboardAnalytics() {
             <CardDescription>Profile Completion</CardDescription>
             <div className="flex items-baseline justify-between">
               <CardTitle className="text-2xl">84%</CardTitle>
-              <Badge variant="default" className="bg-emerald-500">
+              <Badge variant="default" className="bg-emerald-600 hover:bg-emerald-700">
                 <ChevronUp className="mr-1 h-3 w-3" />
                 4%
               </Badge>
@@ -366,10 +366,10 @@ export function DashboardAnalytics() {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-purple-500" />
+                    <Shield className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                     Web3 Verification
                   </CardTitle>
-                  {walletConnected && <Badge className="bg-green-500">Active</Badge>}
+                  {walletConnected && <Badge className="bg-green-600 hover:bg-green-700">Active</Badge>}
                 </div>
                 <CardDescription>Blockchain verification for your portfolio</CardDescription>
               </CardHeader>
@@ -428,10 +428,10 @@ export function DashboardAnalytics() {
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="flex items-center gap-2">
-              <Video className="h-5 w-5 text-red-500" />
+              <Video className="h-5 w-5 text-red-600 dark:text-red-400" />
               Video Generator
             </CardTitle>
-            <Badge className="bg-blue-500">New</Badge>
+            <Badge className="bg-blue-600 hover:bg-blue-700">New</Badge>
           </div>
           <CardDescription>Create professional videos for your portfolio and resume</CardDescription>
         </CardHeader>
@@ -444,7 +444,7 @@ export function DashboardAnalytics() {
                 <span className="font-medium">2</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                <div className="bg-blue-500 h-2 rounded-full" style={{ width: "40%" }}></div>
+                <div className="bg-blue-600 h-2 rounded-full" style={{ width: "40%" }}></div>
               </div>
             </div>
             <div className="space-y-2 border rounded-lg p-4">
@@ -454,7 +454,7 @@ export function DashboardAnalytics() {
                 <span className="font-medium">1</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                <div className="bg-red-500 h-2 rounded-full" style={{ width: "20%" }}></div>
+                <div className="bg-red-600 h-2 rounded-full" style={{ width: "20%" }}></div>
               </div>
             </div>
           </div>

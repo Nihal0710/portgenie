@@ -63,6 +63,31 @@ const config = {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Brand-specific colors
+        brand: {
+          blue: "hsl(var(--brand-blue))",
+          "blue-hover": "hsl(var(--brand-blue-hover))",
+          indigo: "hsl(var(--brand-indigo))",
+          "indigo-hover": "hsl(var(--brand-indigo-hover))",
+          purple: "hsl(var(--brand-purple))",
+          "purple-hover": "hsl(var(--brand-purple-hover))",
+          pink: "hsl(var(--brand-pink))",
+          "pink-hover": "hsl(var(--brand-pink-hover))",
+          red: "hsl(var(--brand-red))",
+          "red-hover": "hsl(var(--brand-red-hover))",
+          green: "hsl(var(--brand-green))",
+          "green-hover": "hsl(var(--brand-green-hover))",
+          yellow: "hsl(var(--brand-yellow))",
+          "yellow-hover": "hsl(var(--brand-yellow-hover))",
+        },
+        // Chart colors
+        chart: {
+          1: "hsl(var(--chart-1))",
+          2: "hsl(var(--chart-2))",
+          3: "hsl(var(--chart-3))",
+          4: "hsl(var(--chart-4))",
+          5: "hsl(var(--chart-5))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

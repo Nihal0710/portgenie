@@ -502,6 +502,7 @@ export function VideoGenerator() {
                     {status !== 'idle' && (
                       <Badge 
                         variant={status === 'completed' ? "default" : status === 'generating' ? "outline" : "destructive"}
+                        className={status === 'generating' ? "text-yellow-700 dark:text-yellow-400 border-yellow-600" : ""}
                       >
                         {status === 'completed' ? 'Completed' : status === 'generating' ? 'Generating' : 'Error'}
                       </Badge>

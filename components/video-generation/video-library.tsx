@@ -83,11 +83,11 @@ export function VideoLibrary() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
-        return <Badge className="bg-green-500">Completed</Badge>
+        return <Badge className="bg-green-600 hover:bg-green-700">Completed</Badge>
       case "generating":
-        return <Badge variant="outline" className="text-yellow-500 border-yellow-500">Generating</Badge>
+        return <Badge variant="outline" className="text-yellow-700 dark:text-yellow-400 border-yellow-600">Generating</Badge>
       case "pending":
-        return <Badge variant="outline" className="text-blue-500 border-blue-500">Pending</Badge>
+        return <Badge variant="outline" className="text-blue-700 dark:text-blue-400 border-blue-600">Pending</Badge>
       case "error":
         return <Badge variant="destructive">Error</Badge>
       default:
@@ -151,7 +151,7 @@ export function VideoLibrary() {
                       {getStatusBadge(video.status)}
                     </div>
                     <div className="absolute bottom-2 left-2">
-                      <Badge variant="outline" className="bg-background/80 backdrop-blur-sm">
+                      <Badge variant="outline" className="bg-background/90 backdrop-blur-sm border-gray-400">
                         {video.video_type === "portfolio" ? "Portfolio" : "Resume"}
                       </Badge>
                     </div>
