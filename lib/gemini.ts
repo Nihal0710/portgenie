@@ -20,7 +20,7 @@ export const generateWebsiteCode = async (
 ) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const { colorScheme = "blue", style = "modern", sections = ["about", "experience", "projects", "skills", "contact"] } = preferences;
 
