@@ -83,7 +83,7 @@ export const generateWebsiteCode = async (
 export const generatePortfolioSuggestions = async (portfolioData: any) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
       Analyze this portfolio data and provide 5 specific suggestions to improve it:
@@ -112,7 +112,7 @@ export const generatePortfolioSuggestions = async (portfolioData: any) => {
 export const extractLinkedInProfile = async (linkedinUrl: string) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
       You are a professional data extractor. I'll provide a LinkedIn profile URL: ${linkedinUrl}
@@ -161,7 +161,7 @@ export const extractLinkedInProfile = async (linkedinUrl: string) => {
 export const extractGitHubProfile = async (githubUrl: string) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
       You are a professional data extractor. I'll provide a GitHub profile URL: ${githubUrl}
@@ -208,7 +208,7 @@ export const extractGitHubProfile = async (githubUrl: string) => {
 export const extractLeetCodeProfile = async (leetcodeUrl: string) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
       You are a professional data extractor. I'll provide a LeetCode profile URL: ${leetcodeUrl}
@@ -259,7 +259,7 @@ export const combineProfiles = async (profiles: {
 }) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
       You are a professional profile integrator. I'll provide data from multiple sources:
@@ -313,7 +313,7 @@ export const combineProfiles = async (profiles: {
 export const generateProjectSuggestions = async (userData: any) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
       You are a tech project advisor. Generate creative project ideas tailored to this user's profile:
@@ -380,7 +380,7 @@ export const generateContentImprovements = async (
 ) => {
   try {
     const genAI = initGemini();
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     let sectionContext = '';
     switch (sectionType) {
