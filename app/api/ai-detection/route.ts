@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { formatDetectionResponse } from '@/lib/ai-detection';
 
 // AI detection service URL - In production, this would be an actual service endpoint
-const AI_DETECTION_SERVICE_URL = process.env.AI_DETECTION_SERVICE_URL || 'http://localhost:8000/detect';
+const AI_DETECTION_SERVICE_URL = process.env.AI_DETECTION_SERVICE_URL || 'https://portgenie.vercel.app';
 
 export async function POST(request: NextRequest) {
   const startTime = performance.now();

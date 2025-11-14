@@ -33,7 +33,7 @@ export default function IntroVideoPage() {
         
         <div className="aspect-video w-full rounded-lg overflow-hidden border">
           <iframe
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+            src="https://www.youtube.com/#"
             title="PortGenie Introduction"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
