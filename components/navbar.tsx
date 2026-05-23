@@ -4,7 +4,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@clerk/nextjs"
 import { UserButton } from "@clerk/nextjs"
-import { LogOut, PlayCircle, Video, Menu, X, Zap } from "lucide-react"
+import Image from "next/image"
+import { LogOut, PlayCircle, Video, Menu, X } from "lucide-react"
 import { ModeToggle } from "@/components/mode-toggle"
 import { WalletConnect } from "@/components/wallet-connect"
 import { useState } from "react"
@@ -27,11 +28,18 @@ export function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
             <motion.div
-              className="p-2 rounded-lg bg-gradient-to-br from-cyber-red to-cyber-red-glow"
+              className="relative h-9 w-9 overflow-hidden rounded-lg ring-1 ring-cyber-red/30"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Zap className="h-5 w-5 text-white" />
+              <Image
+                src="/images/logo.png"
+                alt="PortGenie logo"
+                fill
+                className="object-cover"
+                sizes="36px"
+                priority
+              />
             </motion.div>
             <span className="text-xl font-orbitron font-bold text-glow-lg group-hover:text-glow transition-all duration-300">
               PortGenie 2.0

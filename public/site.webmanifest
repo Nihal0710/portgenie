@@ -1,0 +1,23 @@
+{
+  "name": "PortGenie - Web3 Portfolio Builder",
+  "short_name": "PortGenie",
+  "description": "AI-powered Web3 portfolio and resume builder",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#ff003c",
+  "icons": [
+    {
+      "src": "/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
