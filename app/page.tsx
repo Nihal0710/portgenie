@@ -392,7 +392,9 @@ export default function Home() {
           </div>
 
           <div className="border-t border-cyber-red/20 pt-8 flex flex-col md:flex-row items-center justify-between">
-            <p className="text-cyber-text-secondary text-sm">Â© 2024 PortGenie. All rights reserved.</p>
+            <p className="text-cyber-text-secondary text-sm">
+              {'\u00A9 '}{new Date().getFullYear()} PortGenie. All rights reserved.
+            </p>
             <div className="flex items-center gap-4 mt-4 md:mt-0">
               <a href="#" className="text-cyber-text-secondary hover:text-cyber-red transition-colors">
                 <Twitter className="w-5 h-5" />

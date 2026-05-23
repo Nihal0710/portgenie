@@ -5,13 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Mic, MicOff, Volume2, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 
-const interviewModes = [
+type InterviewMode = 'hr' | 'technical' | 'mixed';
+
+const interviewModes: { id: InterviewMode; label: string; description: string }[] = [
   { id: 'hr', label: 'HR Interview', description: 'Behavioral & communication interview' },
   { id: 'technical', label: 'Technical Interview', description: 'Coding & system design questions' },
   { id: 'mixed', label: 'Mixed Interview', description: 'Combination of both types' },
 ];
 
-const sampleQuestions = {
+const sampleQuestions: Record<InterviewMode, string[]> = {
   hr: [
     'Tell me about yourself and your background.',
     'Why are you interested in this position?',
@@ -22,6 +24,14 @@ const sampleQuestions = {
     'Design a URL shortening service.',
     'Implement a cache system with LRU eviction.',
     'Explain your approach to debugging production issues.',
+    'Build a real-time notification system.',
+  ],
+  mixed: [
+    'Tell me about yourself and your background.',
+    'Design a URL shortening service.',
+    'Describe a challenging project you worked on.',
+    'Explain your approach to debugging production issues.',
+    'How do you handle conflicts in a team?',
     'Build a real-time notification system.',
   ],
 };
@@ -46,11 +56,13 @@ const itemVariants = {
 };
 
 export function InterviewSimulator() {
-  const [selectedMode, setSelectedMode] = useState('hr');
+  const [selectedMode, setSelectedMode] = useState<InterviewMode>('hr');
   const [isRecording, setIsRecording] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
+
+  const questions = sampleQuestions[selectedMode];
 
   return (
     <motion.div
@@ -102,7 +114,7 @@ export function InterviewSimulator() {
               </div>
             </div>
             <p className="text-lg text-cyber-text mb-6 leading-relaxed">
-              {sampleQuestions[selectedMode as keyof typeof sampleQuestions][currentQuestion]}
+              {questions[currentQuestion]}
             </p>
           </div>
 
@@ -183,25 +195,19 @@ export function InterviewSimulator() {
 
           <div className="text-center">
             <p className="text-cyber-text-secondary text-sm">
-              {currentQuestion + 1} of {sampleQuestions[selectedMode as keyof typeof sampleQuestions].length}
+              {currentQuestion + 1} of {questions.length}
             </p>
           </div>
 
           <button
             onClick={() => {
-              if (
-                currentQuestion <
-                sampleQuestions[selectedMode as keyof typeof sampleQuestions].length - 1
-              ) {
+              if (currentQuestion < questions.length - 1) {
                 setCurrentQuestion(currentQuestion + 1);
               }
             }}
             className="px-6 py-2 rounded-lg bg-cyber-red border border-cyber-red text-white hover:shadow-glow transition-all duration-300"
           >
-            {currentQuestion ===
-            sampleQuestions[selectedMode as keyof typeof sampleQuestions].length - 1
-              ? 'Finish'
-              : 'Next'}
+            {currentQuestion === questions.length - 1 ? 'Finish' : 'Next'}
           </button>
         </div>
       </motion.div>
