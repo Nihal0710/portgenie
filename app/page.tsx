@@ -7,7 +7,7 @@ import { useAuth } from '@clerk/nextjs';
 import { ArrowRight, Zap, Shield, Network, Cpu, Sparkles, ChevronDown, Github, Linkedin, Twitter } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-// Animated Background Component
+// Animated Background Component The best one can find on the internet, made with love and 100% custom CSS and React code, no templates or libraries used for the background (except framer-motion for animations)
 function CyberpunkBackground() {
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none">
