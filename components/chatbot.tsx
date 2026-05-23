@@ -1,20 +1,30 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { MessageSquare, X, Send, Loader2, MinusCircle, Bot, User, Sparkles } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState, useRef, useEffect, useCallback } from "react"
+import Image from "next/image"
+import { motion, AnimatePresence } from "framer-motion"
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+  X,
+  Send,
+  Loader2,
+  Minus,
+  Bot,
+  User,
+  Sparkles,
+  Trash2,
+  MessageSquare,
+  Zap,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Avatar } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface ChatMessage {
   role: "user" | "assistant"
@@ -23,32 +33,51 @@ interface ChatMessage {
   isTyping?: boolean
 }
 
+const WELCOME_MESSAGE =
+  "Hey — I'm **Genie**, your PortGenie AI guide. Ask me about portfolios, resumes, Web3 verification, or landing your next role."
+
+const QUICK_PROMPTS = [
+  "How can I improve my portfolio?",
+  "Resume tips for developers",
+  "Explain Web3 verification",
+  "Cover letter best practices",
+] as const
+
+const formatTime = (date: Date) =>
+  date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
+  const [hasInteracted, setHasInteracted] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      content: "Hello! I'm your PortGenie Portfolio Guide powered by Gemini AI. How can I help you today?",
+      content: WELCOME_MESSAGE,
       timestamp: new Date(),
     },
   ])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [isTyping, setIsTyping] = useState(false)
-  const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [])
+
+  const sendMessage = async (text: string) => {
+    const trimmed = text.trim()
+    if (!trimmed || isLoading) return
+
+    setHasInteracted(true)
 
     const userMessage: ChatMessage = {
       role: "user",
-      content: input,
+      content: trimmed,
       timestamp: new Date(),
     }
 
-    // Add placeholder for assistant typing animation
     const typingMessage: ChatMessage = {
       role: "assistant",
       content: "",
@@ -59,72 +88,56 @@ export function Chatbot() {
     setMessages((prev) => [...prev, userMessage, typingMessage])
     setInput("")
     setIsLoading(true)
-    setIsTyping(true)
 
     try {
       const response = await fetch("/api/chatbot", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: input }),
-      });
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: trimmed }),
+      })
 
-      if (!response.ok) {
-        throw new Error("Failed to get response from chatbot API");
-      }
+      if (!response.ok) throw new Error("Failed to get response")
 
-      const data = await response.json();
-      
-      // Replace typing indicator with actual response
+      const data = await response.json()
+
       setMessages((prev) => {
-        const newMessages = [...prev];
-        // Remove the typing indicator
-        newMessages.pop();
-        
-        // Add the actual response
-        newMessages.push({
+        const next = [...prev]
+        next.pop()
+        next.push({
           role: "assistant",
-          content: data.response || "I'm having trouble processing that request. Please try again.",
+          content:
+            data.response ||
+            "I'm having trouble with that. Try rephrasing your question.",
           timestamp: new Date(),
-        });
-        
-        return newMessages;
-      });
+        })
+        return next
+      })
     } catch (error) {
-      console.error("Chatbot error:", error);
-      
-      // Replace typing indicator with error message
+      console.error("Chatbot error:", error)
       setMessages((prev) => {
-        const newMessages = [...prev];
-        // Remove the typing indicator
-        newMessages.pop();
-        
-        // Add error message
-        newMessages.push({
+        const next = [...prev]
+        next.pop()
+        next.push({
           role: "assistant",
-          content: "Sorry, I encountered an error. Please try again later.",
+          content:
+            "Connection hiccup — check your network and try again in a moment.",
           timestamp: new Date(),
-        });
-        
-        return newMessages;
-      });
+        })
+        return next
+      })
     } finally {
       setIsLoading(false)
-      setIsTyping(false)
     }
   }
 
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
-    }
-  }, [messages])
+  const handleSendMessage = () => sendMessage(input)
 
   useEffect(() => {
-    if (isOpen && inputRef.current && !isMinimized) {
-      inputRef.current.focus()
-    }
+    scrollToBottom()
+  }, [messages, scrollToBottom])
+
+  useEffect(() => {
+    if (isOpen && !isMinimized) inputRef.current?.focus()
   }, [isOpen, isMinimized])
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -137,210 +150,358 @@ export function Chatbot() {
   const toggleChat = () => {
     if (isMinimized) {
       setIsMinimized(false)
+      setIsOpen(true)
     } else {
       setIsOpen(!isOpen)
     }
+    setHasInteracted(true)
   }
 
   const minimizeChat = (e: React.MouseEvent) => {
     e.stopPropagation()
     setIsMinimized(true)
+    setIsOpen(false)
   }
 
-  // Save chat history to localStorage
   useEffect(() => {
     if (messages.length > 1) {
-      localStorage.setItem('chatHistory', JSON.stringify(messages))
+      localStorage.setItem("chatHistory", JSON.stringify(messages))
     }
   }, [messages])
 
-  // Load chat history from localStorage on initial render
   useEffect(() => {
-    const savedHistory = localStorage.getItem('chatHistory')
-    if (savedHistory) {
-      try {
-        const parsedHistory = JSON.parse(savedHistory)
-        // Convert string dates back to Date objects
-        const formattedHistory = parsedHistory.map((msg: any) => ({
+    const saved = localStorage.getItem("chatHistory")
+    if (!saved) return
+    try {
+      const parsed = JSON.parse(saved)
+      setMessages(
+        parsed.map((msg: ChatMessage) => ({
           ...msg,
-          timestamp: new Date(msg.timestamp)
+          timestamp: new Date(msg.timestamp),
         }))
-        setMessages(formattedHistory)
-      } catch (e) {
-        console.error("Error parsing chat history:", e)
-      }
+      )
+      setHasInteracted(true)
+    } catch (e) {
+      console.error("Error parsing chat history:", e)
     }
   }, [])
 
   const clearHistory = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setMessages([{
-      role: "assistant",
-      content: "Chat history cleared. How can I help you today?",
-      timestamp: new Date(),
-    }])
-    localStorage.removeItem('chatHistory')
+    setMessages([
+      {
+        role: "assistant",
+        content: "Fresh start. What would you like help with today?",
+        timestamp: new Date(),
+      },
+    ])
+    localStorage.removeItem("chatHistory")
   }
 
+  const showQuickPrompts =
+    !isLoading && messages.length <= 1 && messages[0]?.role === "assistant"
+
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      {isOpen && !isMinimized ? (
-        <Card className="w-80 md:w-96 shadow-xl border-2 border-blue-500/20 rounded-xl overflow-hidden transition-all duration-300 ease-in-out">
-          <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-yellow-300" />
-              <span>PortGenie Guide</span>
-            </CardTitle>
-            <div className="flex items-center gap-1">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={clearHistory}
-                      className="h-7 w-7 rounded-full text-white hover:bg-blue-700/60"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p>Clear chat history</p>
-                  </TooltipContent>
-                </Tooltip>
-                
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 rounded-full text-white hover:bg-blue-700/60"
-                      onClick={minimizeChat}
-                    >
-                      <MinusCircle className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p>Minimize</p>
-                  </TooltipContent>
-                </Tooltip>
-                
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 rounded-full text-white hover:bg-blue-700/60"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p>Close</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </CardHeader>
-          <CardContent className="p-4 pt-2 pb-2 bg-gray-50 dark:bg-gray-900">
-            <ScrollArea 
-              className="h-80" 
-              ref={scrollAreaRef}
-            >
-              <div className="flex flex-col gap-3 pb-1">
-                {messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "flex gap-3 max-w-[95%] animate-in fade-in duration-200",
-                      message.role === "user"
-                        ? "ml-auto flex-row-reverse"
-                        : ""
-                    )}
-                  >
-                    {message.role === "assistant" && (
-                      <Avatar className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 p-1 ring-2 ring-white shadow-sm">
-                        <Bot className="h-4 w-4 text-white" />
-                      </Avatar>
-                    )}
-                    
-                    {message.role === "user" && (
-                      <Avatar className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 p-1 ring-2 ring-white shadow-sm">
-                        <User className="h-4 w-4 text-white" />
-                      </Avatar>
-                    )}
-                    
-                    <div 
-                      className={cn(
-                        "px-4 py-2.5 rounded-2xl shadow-sm text-sm",
-                        message.role === "user"
-                          ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                          : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
-                      )}
-                    >
-                      {message.isTyping ? (
-                        <div className="flex items-center gap-1">
-                          <div className="h-2 w-2 rounded-full bg-blue-500 animate-bounce [animation-delay:0ms]"></div>
-                          <div className="h-2 w-2 rounded-full bg-blue-500 animate-bounce [animation-delay:150ms]"></div>
-                          <div className="h-2 w-2 rounded-full bg-blue-500 animate-bounce [animation-delay:300ms]"></div>
-                        </div>
-                      ) : (
-                        <div className="whitespace-pre-wrap">{message.content}</div>
-                      )}
+    <div className="fixed bottom-4 right-4 z-50 font-space-grotesk">
+      <AnimatePresence mode="wait">
+        {isOpen && !isMinimized ? (
+          <motion.div
+            key="chat-panel"
+            initial={{ opacity: 0, y: 24, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 380, damping: 28 }}
+            className="w-[min(100vw-2rem,24rem)] sm:w-96"
+          >
+            <div className="glass-card-cyber animated-gradient-border overflow-hidden shadow-glow-lg flex flex-col max-h-[min(85vh,640px)]">
+              {/* Header */}
+              <div className="relative px-4 py-3 border-b border-cyber-red/30 bg-gradient-to-r from-black/80 via-cyber-red/10 to-black/80">
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyber-red to-transparent opacity-60" />
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="relative h-10 w-10 shrink-0 rounded-lg overflow-hidden ring-2 ring-cyber-red/40 shadow-glow">
+                      <Image
+                        src="/images/logo.png"
+                        alt="Genie"
+                        fill
+                        className="object-cover"
+                        sizes="40px"
+                      />
+                      <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-black" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-orbitron text-sm font-bold text-glow truncate">
+                        Genie
+                      </p>
+                      <p className="text-[11px] text-cyber-text-secondary flex items-center gap-1">
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        Online · Portfolio AI
+                      </p>
                     </div>
                   </div>
-                ))}
+                  <TooltipProvider delayDuration={300}>
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={clearHistory}
+                            className="h-8 w-8 text-cyber-text-secondary hover:text-cyber-red hover:bg-cyber-red/10"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="glass-card-cyber border-cyber-red/30">
+                          Clear chat
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={minimizeChat}
+                            className="h-8 w-8 text-cyber-text-secondary hover:text-white hover:bg-white/10"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="glass-card-cyber border-cyber-red/30">
+                          Minimize
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setIsOpen(false)}
+                            className="h-8 w-8 text-cyber-text-secondary hover:text-white hover:bg-white/10"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="glass-card-cyber border-cyber-red/30">
+                          Close
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </TooltipProvider>
+                </div>
               </div>
-            </ScrollArea>
-          </CardContent>
-          <CardFooter className="p-3 border-t bg-white dark:bg-gray-900">
-            <div className="flex w-full items-center gap-2">
-              <Input
-                ref={inputRef}
-                placeholder={isLoading ? "Waiting for response..." : "Ask for portfolio help..."}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="flex-1 border-gray-300 dark:border-gray-700 focus-visible:ring-blue-500"
-                disabled={isLoading}
-              />
-              <Button 
-                size="icon" 
-                onClick={handleSendMessage}
-                disabled={isLoading || !input.trim()}
-                className={cn(
-                  "rounded-full transition-all duration-200",
-                  input.trim() ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-300 dark:bg-gray-700"
-                )}
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
+
+              {/* Messages */}
+              <ScrollArea className="flex-1 min-h-0 max-h-[min(50vh,380px)] px-3 py-3">
+                <div className="flex flex-col gap-4 pr-2">
+                  {messages.map((message, index) => (
+                    <motion.div
+                      key={`${message.timestamp.getTime()}-${index}`}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className={cn(
+                        "flex gap-2.5 max-w-[92%]",
+                        message.role === "user" && "ml-auto flex-row-reverse"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+                          message.role === "assistant"
+                            ? "bg-cyber-red/20 ring-1 ring-cyber-red/40"
+                            : "bg-white/10 ring-1 ring-white/20"
+                        )}
+                      >
+                        {message.role === "assistant" ? (
+                          <Bot className="h-4 w-4 text-cyber-red" />
+                        ) : (
+                          <User className="h-4 w-4 text-cyber-red-glow" />
+                        )}
+                      </div>
+                      <div
+                        className={cn(
+                          "flex flex-col gap-1",
+                          message.role === "user" && "items-end"
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed",
+                            message.role === "user"
+                              ? "bg-gradient-to-br from-cyber-red to-cyber-red-dark text-white rounded-br-md shadow-glow"
+                              : "bg-black/50 border border-cyber-red/20 text-cyber-text rounded-bl-md"
+                          )}
+                        >
+                          {message.isTyping ? (
+                            <div className="flex items-center gap-1.5 py-0.5 px-1">
+                              {[0, 150, 300].map((delay) => (
+                                <span
+                                  key={delay}
+                                  className="h-2 w-2 rounded-full bg-cyber-red animate-bounce"
+                                  style={{ animationDelay: `${delay}ms` }}
+                                />
+                              ))}
+                              <span className="text-xs text-cyber-text-secondary ml-2">
+                                Genie is thinking…
+                              </span>
+                            </div>
+                          ) : (
+                            <p className="whitespace-pre-wrap [&_strong]:text-cyber-red-glow [&_strong]:font-semibold">
+                              {message.content.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+                                part.startsWith("**") && part.endsWith("**") ? (
+                                  <strong key={i}>{part.slice(2, -2)}</strong>
+                                ) : (
+                                  <span key={i}>{part}</span>
+                                )
+                              )}
+                            </p>
+                          )}
+                        </div>
+                        {!message.isTyping && (
+                          <span className="text-[10px] text-cyber-text-secondary/70 px-1">
+                            {formatTime(message.timestamp)}
+                          </span>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+              </ScrollArea>
+
+              {/* Quick prompts */}
+              {showQuickPrompts && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="px-3 pb-2 flex flex-wrap gap-1.5"
+                >
+                  {QUICK_PROMPTS.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      onClick={() => sendMessage(prompt)}
+                      className="text-[11px] px-2.5 py-1.5 rounded-full border border-cyber-red/30 bg-cyber-red/5 text-cyber-text-secondary hover:text-white hover:border-cyber-red/60 hover:bg-cyber-red/15 transition-colors"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+
+              {/* Input */}
+              <div className="p-3 pt-2 border-t border-cyber-red/20 bg-black/40">
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      ref={inputRef}
+                      placeholder={
+                        isLoading ? "Genie is typing…" : "Ask about your portfolio…"
+                      }
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      disabled={isLoading}
+                      className="h-11 pr-10 bg-black/60 border-cyber-red/25 text-white placeholder:text-cyber-text-secondary/60 focus-visible:ring-cyber-red/50 focus-visible:border-cyber-red/50 rounded-xl"
+                    />
+                    <Zap className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cyber-red/40 pointer-events-none" />
+                  </div>
+                  <Button
+                    size="icon"
+                    onClick={handleSendMessage}
+                    disabled={isLoading || !input.trim()}
+                    className={cn(
+                      "h-11 w-11 shrink-0 rounded-xl transition-all duration-200",
+                      input.trim()
+                        ? "bg-gradient-to-br from-cyber-red to-cyber-red-dark hover:shadow-glow text-white"
+                        : "bg-white/5 text-cyber-text-secondary border border-white/10"
+                    )}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                <p className="text-[10px] text-center text-cyber-text-secondary/50 mt-2">
+                  Powered by Gemini · PortGenie 2.0
+                </p>
+              </div>
             </div>
-          </CardFooter>
-        </Card>
-      ) : isMinimized ? (
-        <div 
-          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-2 rounded-full shadow-lg cursor-pointer flex items-center gap-2 pr-4 transition-all hover:shadow-xl hover:pr-5 animate-in slide-in-from-right"
-          onClick={toggleChat}
-        >
-          <Avatar className="h-8 w-8 rounded-full bg-white/20">
-            <Bot className="h-5 w-5 text-white" />
-          </Avatar>
-          <span className="text-sm font-medium">PortGenie Guide</span>
-        </div>
-      ) : (
-        <Button
-          className="rounded-full h-14 w-14 shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 hover:shadow-xl animate-in fade-in zoom-in"
-          onClick={toggleChat}
-        >
-          <Sparkles className="h-6 w-6" />
-        </Button>
-      )}
+          </motion.div>
+        ) : isMinimized ? (
+          <motion.button
+            key="minimized"
+            type="button"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            onClick={toggleChat}
+            className="flex items-center gap-3 pl-2 pr-4 py-2 rounded-full glass-card-cyber border border-cyber-red/40 shadow-glow hover:border-cyber-red/70 transition-all group"
+          >
+            <div className="relative h-10 w-10 rounded-full overflow-hidden ring-2 ring-cyber-red/50">
+              <Image
+                src="/images/logo.png"
+                alt="Genie"
+                fill
+                className="object-cover"
+                sizes="40px"
+              />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-orbitron font-semibold text-glow group-hover:text-glow-lg transition-all">
+                Genie
+              </p>
+              <p className="text-[11px] text-cyber-text-secondary">
+                Tap to continue chat
+              </p>
+            </div>
+            <MessageSquare className="h-4 w-4 text-cyber-red ml-1" />
+          </motion.button>
+        ) : (
+          <motion.div
+            key="fab"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            className="relative"
+          >
+            {!hasInteracted && (
+              <span className="absolute inset-0 rounded-full bg-cyber-red/30 animate-ping" />
+            )}
+            <Button
+              onClick={toggleChat}
+              className="relative h-14 w-14 rounded-full p-0 overflow-hidden bg-gradient-to-br from-cyber-red to-cyber-red-dark hover:shadow-glow-lg border border-cyber-red-glow/50 transition-all duration-300 hover:scale-105"
+              aria-label="Open PortGenie AI chat"
+            >
+              <Image
+                src="/images/logo.png"
+                alt=""
+                width={56}
+                height={56}
+                className="object-cover opacity-90"
+              />
+              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black ring-2 ring-cyber-red">
+                <Sparkles className="h-3 w-3 text-cyber-red-glow" />
+              </span>
+            </Button>
+            {!hasInteracted && (
+              <motion.div
+                initial={{ opacity: 0, x: 8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8 }}
+                className="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap hidden sm:block"
+              >
+                <div className="glass-card-cyber px-3 py-2 rounded-lg border border-cyber-red/30 text-xs text-cyber-text-secondary shadow-glow">
+                  Need portfolio help? <span className="text-cyber-red font-medium">Ask Genie</span>
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
-} 
+}
