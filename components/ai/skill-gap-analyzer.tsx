@@ -50,27 +50,27 @@ export function SkillGapAnalyzer() {
     >
       {/* Header */}
       <motion.div variants={itemVariants} className="mb-8">
-        <h2 className="text-3xl font-orbitron font-bold text-white mb-2">AI Skill Gap Analyzer</h2>
-        <p className="text-cyber-text-secondary">Compare your skills with senior-level requirements</p>
+        <h2 className="text-3xl font-display font-bold text-white mb-2">AI Skill Gap Analyzer</h2>
+        <p className="text-muted-foreground">Compare your skills with senior-level requirements</p>
       </motion.div>
 
       {/* Stats Cards */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { icon: TrendingUp, label: 'Current Score', value: '72%', color: 'cyber-red' },
-          { icon: Target, label: 'Target Score', value: '88%', color: 'cyber-red' },
-          { icon: Award, label: 'Skills Gap', value: '16%', color: 'cyber-red-glow' },
-          { icon: Code, label: 'Time to Goal', value: '3-4 months', color: 'cyber-red' },
+          { icon: TrendingUp, label: 'Current Score', value: '72%', color: 'brand' },
+          { icon: Target, label: 'Target Score', value: '88%', color: 'brand' },
+          { icon: Award, label: 'Skills Gap', value: '16%', color: 'brand-light' },
+          { icon: Code, label: 'Time to Goal', value: '3-4 months', color: 'brand' },
         ].map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <div key={i} className="glass-card-cyber p-6 rounded-xl border-2">
+            <div key={i} className="saas-card p-6 rounded-xl border-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-cyber-text-secondary text-sm mb-2">{stat.label}</p>
-                  <p className="text-2xl font-orbitron font-bold text-glow">{stat.value}</p>
+                  <p className="text-muted-foreground text-sm mb-2">{stat.label}</p>
+                  <p className="text-2xl font-display font-bold text-brand">{stat.value}</p>
                 </div>
-                <Icon className="w-8 h-8 text-cyber-red opacity-50" />
+                <Icon className="w-8 h-8 text-brand opacity-50" />
               </div>
             </div>
           );
@@ -78,8 +78,8 @@ export function SkillGapAnalyzer() {
       </motion.div>
 
       {/* Skill Gap Chart */}
-      <motion.div variants={itemVariants} className="glass-card-cyber p-6 rounded-xl border-2">
-        <h3 className="text-xl font-orbitron font-bold text-white mb-6">Skill Comparison</h3>
+      <motion.div variants={itemVariants} className="saas-card p-6 rounded-xl border-2">
+        <h3 className="text-xl font-display font-bold text-white mb-6">Skill Comparison</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={skillData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 0, 60, 0.1)" />
@@ -100,8 +100,8 @@ export function SkillGapAnalyzer() {
       </motion.div>
 
       {/* Radar Chart */}
-      <motion.div variants={itemVariants} className="glass-card-cyber p-6 rounded-xl border-2">
-        <h3 className="text-xl font-orbitron font-bold text-white mb-6">Competency Profile</h3>
+      <motion.div variants={itemVariants} className="saas-card p-6 rounded-xl border-2">
+        <h3 className="text-xl font-display font-bold text-white mb-6">Competency Profile</h3>
         <ResponsiveContainer width="100%" height={350}>
           <RadarChart data={radarData}>
             <PolarGrid stroke="rgba(255, 0, 60, 0.2)" />
@@ -122,8 +122,8 @@ export function SkillGapAnalyzer() {
       </motion.div>
 
       {/* Recommended Roadmap */}
-      <motion.div variants={itemVariants} className="glass-card-cyber p-6 rounded-xl border-2">
-        <h3 className="text-xl font-orbitron font-bold text-white mb-6">Personalized Growth Roadmap</h3>
+      <motion.div variants={itemVariants} className="saas-card p-6 rounded-xl border-2">
+        <h3 className="text-xl font-display font-bold text-white mb-6">Personalized Growth Roadmap</h3>
         <div className="space-y-4">
           {[
             {
@@ -142,14 +142,14 @@ export function SkillGapAnalyzer() {
               resources: ['Tech Mentoring', 'Presentation Skills', 'Team Project Leadership'],
             },
           ].map((item, i) => (
-            <div key={i} className="flex gap-4 pb-4 border-b border-cyber-red/20 last:border-b-0 last:pb-0">
-              <div className="flex-shrink-0 w-1 h-auto min-h-16 bg-gradient-to-b from-cyber-red to-transparent rounded-full" />
+            <div key={i} className="flex gap-4 pb-4 border-b border-brand/20 last:border-b-0 last:pb-0">
+              <div className="flex-shrink-0 w-1 h-auto min-h-16 bg-gradient-to-b from-brand to-transparent rounded-full" />
               <div>
-                <h4 className="font-orbitron font-bold text-white mb-2">{item.month}</h4>
-                <p className="text-cyber-text-secondary mb-3">{item.focus}</p>
+                <h4 className="font-display font-bold text-white mb-2">{item.month}</h4>
+                <p className="text-muted-foreground mb-3">{item.focus}</p>
                 <div className="flex flex-wrap gap-2">
                   {item.resources.map((res, j) => (
-                    <span key={j} className="px-3 py-1 rounded-full text-xs bg-cyber-red/20 border border-cyber-red/40 text-cyber-red">
+                    <span key={j} className="px-3 py-1 rounded-full text-xs bg-brand/20 border border-brand/40 text-brand">
                       {res}
                     </span>
                   ))}

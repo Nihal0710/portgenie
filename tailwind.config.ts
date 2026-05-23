@@ -15,26 +15,26 @@ const config = {
       center: true,
       padding: "2rem",
       screens: {
-        "2xl": "1400px",
+        "2xl": "1280px",
       },
     },
     fontFamily: {
-      orbitron: ["var(--font-orbitron)"],
-      "space-grotesk": ["var(--font-space-grotesk)"],
-      sans: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
+      sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+      display: ["var(--font-space-grotesk)", "var(--font-inter)", "system-ui", "sans-serif"],
     },
     extend: {
       colors: {
-        // Cyberpunk Theme
-        "cyber-bg": "#050505",
-        "cyber-red": "#ff003c",
-        "cyber-red-dark": "#8b0000",
-        "cyber-red-glow": "#ff4d6d",
-        "cyber-text": "#ffffff",
-        "cyber-text-secondary": "#a1a1aa",
-        "cyber-border": "rgba(255, 0, 60, 0.2)",
-        "cyber-border-strong": "rgba(255, 0, 60, 0.5)",
-        
+        brand: {
+          DEFAULT: "#ef4444",
+          light: "#f87171",
+          dark: "#dc2626",
+          muted: "rgba(239, 68, 68, 0.12)",
+        },
+        surface: {
+          DEFAULT: "hsl(var(--background))",
+          raised: "hsl(var(--surface-raised))",
+          card: "hsl(var(--card))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -68,20 +68,21 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        success: "#22c55e",
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "1rem",
+        "2xl": "1.25rem",
       },
       boxShadow: {
-        glow: "0 0 20px rgba(255, 0, 60, 0.5)",
-        "glow-lg": "0 0 40px rgba(255, 0, 60, 0.6)",
-        "glow-xl": "0 0 60px rgba(255, 0, 60, 0.7)",
-        "neon": "0 0 10px rgba(255, 77, 109, 0.6), inset 0 0 10px rgba(255, 77, 109, 0.2)",
-      },
-      backdropBlur: {
-        xs: "2px",
+        soft: "0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35)",
+        card: "0 0 0 1px rgba(255, 255, 255, 0.06), 0 12px 40px rgba(0, 0, 0, 0.45)",
+        "card-hover":
+          "0 0 0 1px rgba(255, 255, 255, 0.1), 0 16px 48px rgba(0, 0, 0, 0.5)",
+        brand: "0 4px 24px rgba(239, 68, 68, 0.15)",
       },
       keyframes: {
         "accordion-down": {
@@ -92,39 +93,36 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(255, 0, 60, 0.4)" },
-          "50%": { boxShadow: "0 0 40px rgba(255, 0, 60, 0.8)" },
-        },
-        "float": {
+        float: {
           "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-20px)" },
-        },
-        "slide-in-up": {
-          from: { transform: "translateY(40px)", opacity: "0" },
-          to: { transform: "translateY(0)", opacity: "1" },
+          "50%": { transform: "translateY(-8px)" },
         },
         "fade-in": {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
-        "shimmer": {
-          "0%": { backgroundPosition: "-1000px 0" },
-          "100%": { backgroundPosition: "1000px 0" },
+        "fade-in-up": {
+          from: { opacity: "0", transform: "translateY(12px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "glow-pulse": "glow-pulse 2s ease-in-out infinite",
-        "float": "float 3s ease-in-out infinite",
-        "slide-in-up": "slide-in-up 0.5s ease-out",
-        "fade-in": "fade-in 0.8s ease-out",
-        "shimmer": "shimmer 2s infinite",
+        float: "float 6s ease-in-out infinite",
+        "fade-in": "fade-in 0.5s ease-out",
+        "fade-in-up": "fade-in-up 0.5s ease-out",
+        shimmer: "shimmer 2.5s linear infinite",
       },
       backgroundImage: {
-        "gradient-glow": "linear-gradient(135deg, rgba(255, 0, 60, 0.1) 0%, rgba(255, 77, 109, 0.1) 100%)",
-        "gradient-cyber": "linear-gradient(135deg, #050505 0%, #1a0505 50%, #050505 100%)",
+        "hero-gradient":
+          "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(239, 68, 68, 0.12), transparent), radial-gradient(ellipse 60% 40% at 100% 0%, rgba(255, 255, 255, 0.04), transparent)",
+        "grid-subtle":
+          "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
       },
     },
   },
@@ -132,4 +130,3 @@ const config = {
 } satisfies Config
 
 export default config
-

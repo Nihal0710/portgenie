@@ -1,23 +1,17 @@
 {
-  "name": "PortGenie - Web3 Portfolio Builder",
+  "name": "PortGenie 2.0",
   "short_name": "PortGenie",
-  "description": "AI-powered Web3 portfolio and resume builder",
+  "description": "Build. Verify. Analyze. Get Hired.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
-  "theme_color": "#ff003c",
+  "theme_color": "#0a0a0a",
   "icons": [
     {
-      "src": "/images/logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any"
-    },
-    {
-      "src": "/images/logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ]
 }

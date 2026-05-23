@@ -76,8 +76,8 @@ export function PortfolioAnalytics() {
     >
       {/* Header */}
       <motion.div variants={itemVariants} className="mb-8">
-        <h2 className="text-3xl font-orbitron font-bold text-white mb-2">Portfolio Review Score</h2>
-        <p className="text-cyber-text-secondary">AI-powered analysis of your portfolio quality</p>
+        <h2 className="text-3xl font-display font-bold text-white mb-2">Portfolio Review Score</h2>
+        <p className="text-muted-foreground">AI-powered analysis of your portfolio quality</p>
       </motion.div>
 
       {/* Main Score Cards */}
@@ -107,32 +107,32 @@ export function PortfolioAnalytics() {
         ].map((card, i) => {
           const Icon = card.icon;
           return (
-            <div key={i} className="glass-card-cyber p-8 rounded-xl border-2">
+            <div key={i} className="saas-card p-8 rounded-xl border-2">
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <p className="text-cyber-text-secondary text-sm mb-2 font-orbitron">{card.label}</p>
-                  <p className="text-4xl font-orbitron font-bold text-glow-lg">{card.score}%</p>
-                  <p className="text-cyber-text-secondary text-xs mt-1">{card.subtitle}</p>
+                  <p className="text-muted-foreground text-sm mb-2 font-display">{card.label}</p>
+                  <p className="text-4xl font-display font-bold ">{card.score}%</p>
+                  <p className="text-muted-foreground text-xs mt-1">{card.subtitle}</p>
                 </div>
-                <Icon className="w-8 h-8 text-cyber-red/50" />
+                <Icon className="w-8 h-8 text-brand/50" />
               </div>
-              <div className="w-full h-2 bg-cyber-red/20 rounded-full overflow-hidden">
+              <div className="w-full h-2 bg-brand/20 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-cyber-red to-cyber-red-glow rounded-full"
+                  className="h-full bg-gradient-to-r from-brand to-brand-light rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${card.score}%` }}
                   transition={{ duration: 1.5, ease: 'easeOut' }}
                 />
               </div>
-              <p className="text-cyber-red text-sm mt-3 font-semibold">{card.trend}</p>
+              <p className="text-brand text-sm mt-3 font-semibold">{card.trend}</p>
             </div>
           );
         })}
       </motion.div>
 
       {/* Score Trend Chart */}
-      <motion.div variants={itemVariants} className="glass-card-cyber p-6 rounded-xl border-2">
-        <h3 className="text-xl font-orbitron font-bold text-white mb-6">Score Progression</h3>
+      <motion.div variants={itemVariants} className="saas-card p-6 rounded-xl border-2">
+        <h3 className="text-xl font-display font-bold text-white mb-6">Score Progression</h3>
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={scoreData}>
             <defs>
@@ -166,8 +166,8 @@ export function PortfolioAnalytics() {
       {/* Category Breakdown */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Pie Chart */}
-        <div className="glass-card-cyber p-6 rounded-xl border-2">
-          <h3 className="text-xl font-orbitron font-bold text-white mb-6">Category Breakdown</h3>
+        <div className="saas-card p-6 rounded-xl border-2">
+          <h3 className="text-xl font-display font-bold text-white mb-6">Category Breakdown</h3>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
@@ -201,7 +201,7 @@ export function PortfolioAnalytics() {
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: item.color }}
                   />
-                  <span className="text-cyber-text-secondary">{item.name}</span>
+                  <span className="text-muted-foreground">{item.name}</span>
                 </div>
                 <span className="font-semibold text-white">{item.value}%</span>
               </div>
@@ -210,8 +210,8 @@ export function PortfolioAnalytics() {
         </div>
 
         {/* Improvement Suggestions */}
-        <div className="glass-card-cyber p-6 rounded-xl border-2">
-          <h3 className="text-xl font-orbitron font-bold text-white mb-6">Improvement Suggestions</h3>
+        <div className="saas-card p-6 rounded-xl border-2">
+          <h3 className="text-xl font-display font-bold text-white mb-6">Improvement Suggestions</h3>
           <div className="space-y-3">
             {improvements.map((item, i) => (
               <motion.div
@@ -219,14 +219,14 @@ export function PortfolioAnalytics() {
                 className={`p-4 rounded-lg border-l-4 ${
                   item.status === 'critical'
                     ? 'bg-red-500/10 border-red-500'
-                    : 'bg-cyber-red/10 border-cyber-red'
+                    : 'bg-brand/10 border-brand'
                 }`}
                 whileHover={{ x: 4 }}
               >
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="font-semibold text-white text-sm">{item.title}</p>
-                    <p className="text-cyber-text-secondary text-xs mt-1">{item.impact}</p>
+                    <p className="text-muted-foreground text-xs mt-1">{item.impact}</p>
                   </div>
                   <span
                     className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${
@@ -245,8 +245,8 @@ export function PortfolioAnalytics() {
       </motion.div>
 
       {/* Optimization Tips */}
-      <motion.div variants={itemVariants} className="glass-card-cyber p-6 rounded-xl border-2">
-        <h3 className="text-xl font-orbitron font-bold text-white mb-4">Quick Optimization Tips</h3>
+      <motion.div variants={itemVariants} className="saas-card p-6 rounded-xl border-2">
+        <h3 className="text-xl font-display font-bold text-white mb-4">Quick Optimization Tips</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             {
@@ -266,9 +266,9 @@ export function PortfolioAnalytics() {
               desc: 'Regularly update skills and experience sections',
             },
           ].map((tip, i) => (
-            <div key={i} className="bg-black/40 p-4 rounded-lg border border-cyber-red/20">
+            <div key={i} className="bg-black/40 p-4 rounded-lg border border-brand/20">
               <p className="font-semibold text-white mb-2">{tip.title}</p>
-              <p className="text-cyber-text-secondary text-sm">{tip.desc}</p>
+              <p className="text-muted-foreground text-sm">{tip.desc}</p>
             </div>
           ))}
         </div>

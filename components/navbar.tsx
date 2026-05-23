@@ -1,202 +1,135 @@
 ﻿"use client"
 
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { useAuth } from "@clerk/nextjs"
-import { UserButton } from "@clerk/nextjs"
-import Image from "next/image"
-import { LogOut, PlayCircle, Video, Menu, X } from "lucide-react"
-import { ModeToggle } from "@/components/mode-toggle"
-import { WalletConnect } from "@/components/wallet-connect"
+import { usePathname } from "next/navigation"
+import { useAuth, UserButton } from "@clerk/nextjs"
+import { Menu, X } from "lucide-react"
 import { useState } from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
+import { Logo } from "@/components/layout/logo"
+import { ModeToggle } from "@/components/mode-toggle"
+import { cn } from "@/lib/utils"
+
+const navLinks = [
+  { href: "#features", label: "Features" },
+  { href: "#platform", label: "Platform" },
+  { href: "#pricing", label: "Pricing" },
+]
 
 export function Navbar() {
+  const pathname = usePathname()
   const { isLoaded, isSignedIn } = useAuth()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  if (
+    pathname?.startsWith("/dashboard") ||
+    pathname?.startsWith("/sign-in") ||
+    pathname?.startsWith("/sign-up")
+  ) {
+    return null
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      {/* Glassmorphic background */}
-      <div className="absolute inset-0 backdrop-blur-xl bg-black/40 border-b border-cyber-red/20" />
-      
-      {/* Glow effect */}
-      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-1 bg-gradient-to-r from-transparent via-cyber-red to-transparent blur-xl opacity-50" />
+      <div className="absolute inset-0 border-b border-border bg-background/80 backdrop-blur-xl" />
+      <div className="relative mx-auto flex h-[4.25rem] max-w-7xl items-center justify-between px-4 md:px-6">
+        <Logo size="md" />
 
-      <div className="relative w-full px-4 md:px-6">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3 group">
-            <motion.div
-              className="relative h-9 w-9 overflow-hidden rounded-lg ring-1 ring-cyber-red/30"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Image
-                src="/images/logo.png"
-                alt="PortGenie logo"
-                fill
-                className="object-cover"
-                sizes="36px"
-                priority
-              />
-            </motion.div>
-            <span className="text-xl font-orbitron font-bold text-glow-lg group-hover:text-glow transition-all duration-300">
-              PortGenie 2.0
-            </span>
-          </Link>
+        <nav className="hidden md:flex items-center gap-8">
+          {!isSignedIn &&
+            navLinks.map((link) => (
+              <a key={link.href} href={link.href} className="nav-link">
+                {link.label}
+              </a>
+            ))}
+          {isLoaded && isSignedIn && (
+            <Link href="/dashboard" className="nav-link">
+              Dashboard
+            </Link>
+          )}
+        </nav>
 
-          {/* Mobile Menu Button */}
-          <motion.button
-            className="md:hidden p-2 text-cyber-red hover:bg-cyber-red/10 rounded-lg transition-colors"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            whileTap={{ scale: 0.95 }}
-          >
-            {isMobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </motion.button>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-2">
-            {isLoaded && isSignedIn ? (
-              <>
-                <Link href="/dashboard">
-                  <motion.button
-                    className="px-4 py-2 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors duration-300 font-medium"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Dashboard
-                  </motion.button>
-                </Link>
-                <motion.button 
-                  className="px-4 py-2 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors duration-300 font-medium flex items-center gap-2"
-                  onClick={() => window.open('/intro-video', '_blank')}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <PlayCircle className="h-4 w-4" />
-                  Intro Video
-                </motion.button>
-                <Link href="/dashboard/video-generation">
-                  <motion.button
-                    className="px-4 py-2 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors duration-300 font-medium flex items-center gap-2"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Video className="h-4 w-4" />
-                    Video
-                  </motion.button>
-                </Link>
-                <WalletConnect />
-                <Link href="/sign-out">
-                  <motion.button
-                    className="px-4 py-2 rounded-lg text-cyber-red hover:bg-cyber-red/20 transition-colors duration-300 font-medium flex items-center gap-2"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Sign Out
-                  </motion.button>
-                </Link>
-                <UserButton afterSignOutUrl="/" />
-                <ModeToggle />
-              </>
-            ) : (
-              <>
-                <Link href="/sign-in">
-                  <motion.button
-                    className="px-4 py-2 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors duration-300 font-medium"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Sign In
-                  </motion.button>
-                </Link>
-                <Link href="/sign-up">
-                  <motion.button
-                    className="btn-neon text-sm"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Get Started
-                  </motion.button>
-                </Link>
-                <ModeToggle />
-              </>
-            )}
-          </nav>
-
-          {/* Mobile Navigation */}
-          {isMobileMenuOpen && (
-            <motion.div
-              className="fixed inset-0 z-40 bg-black/80 backdrop-blur-xl md:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <div className="flex flex-col h-full pt-20 px-4 space-y-4">
-                <button
-                  className="absolute top-4 right-4 p-2 text-cyber-red"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <X className="h-6 w-6" />
-                </button>
-
-                {isLoaded && isSignedIn ? (
-                  <>
-                    <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                      <button className="w-full px-4 py-3 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors text-left">
-                        Dashboard
-                      </button>
-                    </Link>
-                    <button 
-                      className="w-full px-4 py-3 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors text-left flex items-center gap-2"
-                      onClick={() => {
-                        window.open('/intro-video', '_blank')
-                        setIsMobileMenuOpen(false)
-                      }}
-                    >
-                      <PlayCircle className="h-4 w-4" />
-                      Intro Video
-                    </button>
-                    <Link href="/dashboard/video-generation" onClick={() => setIsMobileMenuOpen(false)}>
-                      <button className="w-full px-4 py-3 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors text-left flex items-center gap-2">
-                        <Video className="h-4 w-4" />
-                        Video Generation
-                      </button>
-                    </Link>
-                    <div className="border-t border-cyber-red/20 pt-4">
-                      <Link href="/sign-out">
-                        <button className="w-full px-4 py-3 rounded-lg text-cyber-red hover:bg-cyber-red/10 transition-colors text-left flex items-center gap-2">
-                          <LogOut className="h-4 w-4" />
-                          Sign Out
-                        </button>
-                      </Link>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <Link href="/sign-in" onClick={() => setIsMobileMenuOpen(false)}>
-                      <button className="w-full px-4 py-3 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors">
-                        Sign In
-                      </button>
-                    </Link>
-                    <Link href="/sign-up" onClick={() => setIsMobileMenuOpen(false)}>
-                      <button className="w-full btn-neon">
-                        Get Started
-                      </button>
-                    </Link>
-                  </>
-                )}
-              </div>
-            </motion.div>
+        <div className="hidden md:flex items-center gap-3">
+          <ModeToggle />
+          {isLoaded && isSignedIn ? (
+            <>
+              <Link href="/dashboard" className="btn-brand-outline text-sm py-2">
+                Open app
+              </Link>
+              <UserButton afterSignOutUrl="/" />
+            </>
+          ) : (
+            <>
+              <Link href="/sign-in" className="nav-link px-2">
+                Sign in
+              </Link>
+              <Link href="/sign-up" className="btn-brand text-sm py-2">
+                Get Started
+              </Link>
+            </>
           )}
         </div>
+
+        <button
+          type="button"
+          className="md:hidden p-2 text-muted-foreground hover:text-foreground"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle menu"
+        >
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
       </div>
+
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden relative border-b border-border bg-card/95 backdrop-blur-xl"
+          >
+            <div className="flex flex-col gap-1 p-4">
+              {!isSignedIn &&
+                navLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className="rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              {isLoaded && isSignedIn ? (
+                <Link
+                  href="/dashboard"
+                  className="btn-brand justify-center mt-2"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <div className="flex flex-col gap-2 mt-2">
+                  <Link
+                    href="/sign-in"
+                    className={cn("btn-brand-outline justify-center")}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className="btn-brand justify-center"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Get Started
+                  </Link>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   )
 }

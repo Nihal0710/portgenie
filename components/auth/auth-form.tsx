@@ -26,11 +26,11 @@ export function CyberpunkAuthForm({ title, subtitle, isSignUp }: AuthFormProps) 
   };
 
   return (
-    <div className="min-h-screen bg-cyber-bg text-cyber-text flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-surface text-foreground flex items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-80 h-80 bg-cyber-red/10 rounded-full blur-3xl opacity-20"></div>
-        <div className="absolute top-1/2 -right-40 w-96 h-96 bg-cyber-red-glow/10 rounded-full blur-3xl opacity-15"></div>
+        <div className="absolute -top-40 -left-40 w-80 h-80 bg-brand/10 rounded-full blur-3xl opacity-20"></div>
+        <div className="absolute top-1/2 -right-40 w-96 h-96 bg-brand-light/10 rounded-full blur-3xl opacity-15"></div>
         <div className="absolute inset-0" style={{
           backgroundImage: 'linear-gradient(rgba(255, 0, 60, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 0, 60, 0.03) 1px, transparent 1px)',
           backgroundSize: '50px 50px',
@@ -44,7 +44,7 @@ export function CyberpunkAuthForm({ title, subtitle, isSignUp }: AuthFormProps) 
         animate="visible"
       >
         {/* Card */}
-        <div className="glass-card-cyber p-8 rounded-2xl border-2 space-y-6">
+        <div className="saas-card p-8 rounded-2xl border-2 space-y-6">
           {/* Header */}
           <motion.div
             className="text-center space-y-2"
@@ -54,11 +54,11 @@ export function CyberpunkAuthForm({ title, subtitle, isSignUp }: AuthFormProps) 
               className="flex items-center justify-center gap-2 mb-4"
               whileHover={{ scale: 1.1 }}
             >
-              <Zap className="w-6 h-6 text-cyber-red" />
-              <span className="text-xl font-orbitron font-bold text-glow">PortGenie 2.0</span>
+              <Zap className="w-6 h-6 text-brand" />
+              <span className="text-xl font-display font-bold text-brand">PortGenie 2.0</span>
             </motion.div>
-            <h1 className="text-3xl font-orbitron font-bold text-white">{title}</h1>
-            <p className="text-cyber-text-secondary text-sm">{subtitle}</p>
+            <h1 className="text-3xl font-display font-bold text-white">{title}</h1>
+            <p className="text-muted-foreground text-sm">{subtitle}</p>
           </motion.div>
 
           {/* Form */}
@@ -70,17 +70,17 @@ export function CyberpunkAuthForm({ title, subtitle, isSignUp }: AuthFormProps) 
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <label className="block text-sm font-orbitron text-cyber-text-secondary mb-2">
+              <label className="block text-sm font-display text-muted-foreground mb-2">
                 Email Address
               </label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-cyber-red/50 group-focus-within:text-cyber-red transition-colors" />
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-brand/50 group-focus-within:text-brand transition-colors" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full pl-12 pr-4 py-3 bg-black/40 border border-cyber-red/30 rounded-lg text-white placeholder-cyber-text-secondary/50 focus:border-cyber-red focus:outline-none focus:shadow-glow transition-all duration-300"
+                  className="w-full pl-12 pr-4 py-3 bg-black/40 border border-brand/30 rounded-lg text-white placeholder-muted-foreground/50 focus:border-brand focus:outline-none focus:shadow-brand transition-all duration-300"
                 />
               </div>
             </motion.div>
@@ -92,22 +92,22 @@ export function CyberpunkAuthForm({ title, subtitle, isSignUp }: AuthFormProps) 
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <label className="block text-sm font-orbitron text-cyber-text-secondary mb-2">
+              <label className="block text-sm font-display text-muted-foreground mb-2">
                 Password
               </label>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-cyber-red/50 group-focus-within:text-cyber-red transition-colors" />
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-brand/50 group-focus-within:text-brand transition-colors" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-12 pr-12 py-3 bg-black/40 border border-cyber-red/30 rounded-lg text-white placeholder-cyber-text-secondary/50 focus:border-cyber-red focus:outline-none focus:shadow-glow transition-all duration-300"
+                  className="w-full pl-12 pr-12 py-3 bg-black/40 border border-brand/30 rounded-lg text-white placeholder-muted-foreground/50 focus:border-brand focus:outline-none focus:shadow-brand transition-all duration-300"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-cyber-text-secondary hover:text-cyber-red transition-colors"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-brand transition-colors"
                 >
                   {showPassword ? (
                     <EyeOff className="w-5 h-5" />
@@ -129,7 +129,7 @@ export function CyberpunkAuthForm({ title, subtitle, isSignUp }: AuthFormProps) 
                 <Link href="/forgot-password">
                   <button
                     type="button"
-                    className="text-sm text-cyber-red hover:text-cyber-red-glow transition-colors"
+                    className="text-sm text-brand hover:text-brand-light transition-colors"
                   >
                     Forgot password?
                   </button>
@@ -140,7 +140,7 @@ export function CyberpunkAuthForm({ title, subtitle, isSignUp }: AuthFormProps) 
             {/* Submit Button */}
             <motion.button
               type="submit"
-              className="w-full btn-neon py-3 font-orbitron font-bold text-center mt-6"
+              className="w-full btn-brand py-3 font-display font-bold text-center mt-6"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               initial={{ opacity: 0, y: 20 }}
@@ -153,15 +153,15 @@ export function CyberpunkAuthForm({ title, subtitle, isSignUp }: AuthFormProps) 
 
           {/* Divider */}
           <div className="relative flex items-center gap-4">
-            <div className="flex-1 h-px bg-gradient-to-r from-cyber-red/0 via-cyber-red/30 to-cyber-red/0"></div>
-            <span className="text-xs text-cyber-text-secondary font-orbitron">OR</span>
-            <div className="flex-1 h-px bg-gradient-to-r from-cyber-red/0 via-cyber-red/30 to-cyber-red/0"></div>
+            <div className="flex-1 h-px bg-gradient-to-r from-brand/0 via-brand/30 to-brand/0"></div>
+            <span className="text-xs text-muted-foreground font-display">OR</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-brand/0 via-brand/30 to-brand/0"></div>
           </div>
 
           {/* OAuth Button */}
           <motion.button
             type="button"
-            className="w-full px-4 py-3 rounded-lg border border-cyber-red/30 text-white hover:bg-cyber-red/10 transition-all duration-300 flex items-center justify-center gap-2 font-semibold"
+            className="w-full px-4 py-3 rounded-lg border border-brand/30 text-white hover:bg-brand/10 transition-all duration-300 flex items-center justify-center gap-2 font-semibold"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -171,7 +171,7 @@ export function CyberpunkAuthForm({ title, subtitle, isSignUp }: AuthFormProps) 
 
           {/* Footer Text */}
           <motion.div
-            className="text-center text-sm text-cyber-text-secondary"
+            className="text-center text-sm text-muted-foreground"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -180,7 +180,7 @@ export function CyberpunkAuthForm({ title, subtitle, isSignUp }: AuthFormProps) 
               <>
                 Already have an account?{' '}
                 <Link href="/sign-in">
-                  <button className="text-cyber-red hover:text-cyber-red-glow transition-colors font-semibold">
+                  <button className="text-brand hover:text-brand-light transition-colors font-semibold">
                     Sign in
                   </button>
                 </Link>
@@ -189,7 +189,7 @@ export function CyberpunkAuthForm({ title, subtitle, isSignUp }: AuthFormProps) 
               <>
                 Don't have an account?{' '}
                 <Link href="/sign-up">
-                  <button className="text-cyber-red hover:text-cyber-red-glow transition-colors font-semibold">
+                  <button className="text-brand hover:text-brand-light transition-colors font-semibold">
                     Sign up
                   </button>
                 </Link>
@@ -199,30 +199,30 @@ export function CyberpunkAuthForm({ title, subtitle, isSignUp }: AuthFormProps) 
 
           {/* Terms */}
           <motion.p
-            className="text-xs text-cyber-text-secondary/70 text-center leading-relaxed"
+            className="text-xs text-muted-foreground/70 text-center leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
           >
             By {isSignUp ? 'creating an account' : 'signing in'}, you agree to our{' '}
             <Link href="/terms">
-              <button className="text-cyber-red hover:underline">Terms</button>
+              <button className="text-brand hover:underline">Terms</button>
             </Link>
             {' '}and{' '}
             <Link href="/privacy">
-              <button className="text-cyber-red hover:underline">Privacy Policy</button>
+              <button className="text-brand hover:underline">Privacy Policy</button>
             </Link>
           </motion.p>
         </div>
 
         {/* Floating Cards Background */}
         <motion.div
-          className="absolute -top-20 -left-20 w-40 h-40 glass-card-cyber rounded-xl opacity-20 border border-cyber-red/10"
+          className="absolute -top-20 -left-20 w-40 h-40 saas-card rounded-xl opacity-20 border border-brand/10"
           animate={{ y: [0, 20, 0] }}
           transition={{ duration: 4, repeat: Infinity }}
         />
         <motion.div
-          className="absolute -bottom-20 -right-20 w-40 h-40 glass-card-cyber rounded-xl opacity-20 border border-cyber-red/10"
+          className="absolute -bottom-20 -right-20 w-40 h-40 saas-card rounded-xl opacity-20 border border-brand/10"
           animate={{ y: [0, -20, 0] }}
           transition={{ duration: 4, repeat: Infinity }}
         />

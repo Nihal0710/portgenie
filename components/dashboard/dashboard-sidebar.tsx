@@ -14,15 +14,13 @@ import {
   User,
   Wallet,
   Shield,
-  Moon,
-  Sun,
   Layers,
   Crown,
   FileEdit,
   ImageIcon,
   Globe,
 } from "lucide-react"
-import { useTheme } from "next-themes"
+import { ModeToggle } from "@/components/mode-toggle"
 import { useUser } from "@clerk/nextjs"
 import {
   Sidebar,
@@ -41,10 +39,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getUserProfile } from "@/lib/supabase"
 import { SubscriptionBadge } from "@/components/subscription-plans"
+import { Logo } from "@/components/layout/logo"
 
 export function DashboardSidebar() {
   const pathname = usePathname()
-  const { theme, setTheme } = useTheme()
   const { user, isLoaded } = useUser()
   const [userInitials, setUserInitials] = useState("JD")
   const [userName, setUserName] = useState("John Doe")
@@ -146,15 +144,14 @@ export function DashboardSidebar() {
   ]
 
   return (
-    <Sidebar variant="inset" collapsible="icon">
-      <SidebarHeader className="flex flex-col items-start gap-4 px-4 py-4">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-              <span className="text-lg font-bold text-primary-foreground">PG</span>
-            </div>
-            <span className="text-xl font-bold">PortGenie</span>
-          </Link>
+    <Sidebar
+      variant="inset"
+      collapsible="icon"
+      className="border-r border-border bg-sidebar"
+    >
+      <SidebarHeader className="flex flex-col items-start gap-4 px-4 py-4 border-b border-border">
+        <div className="flex w-full items-center gap-2">
+          <Logo size="sm" href="/dashboard" />
           <div className="ml-auto md:hidden">
             <SidebarTrigger />
           </div>
@@ -195,10 +192,12 @@ export function DashboardSidebar() {
                 </SidebarMenuItem>
               ))}
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setTheme(theme === "dark" ? "light" : "dark")} tooltip="Toggle Theme">
-                  {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                  <span>Toggle Theme</span>
-                </SidebarMenuButton>
+                <div className="flex items-center gap-2 px-2 py-1.5">
+                  <ModeToggle />
+                  <span className="text-sm text-muted-foreground group-data-[collapsible=icon]:hidden">
+                    Theme
+                  </span>
+                </div>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>

@@ -73,8 +73,8 @@ export function InterviewSimulator() {
     >
       {/* Header */}
       <motion.div variants={itemVariants} className="mb-8">
-        <h2 className="text-3xl font-orbitron font-bold text-white mb-2">AI Interview Simulator</h2>
-        <p className="text-cyber-text-secondary">Practice interviews with AI feedback and analysis</p>
+        <h2 className="text-3xl font-display font-bold text-white mb-2">AI Interview Simulator</h2>
+        <p className="text-muted-foreground">Practice interviews with AI feedback and analysis</p>
       </motion.div>
 
       {/* Mode Selection */}
@@ -88,45 +88,45 @@ export function InterviewSimulator() {
                 setCurrentQuestion(0);
                 setAnswers([]);
               }}
-              className={`glass-card-cyber p-6 rounded-xl border-2 transition-all duration-300 text-left ${
-                selectedMode === mode.id ? 'border-cyber-red shadow-glow' : 'border-cyber-red/30'
+              className={`saas-card p-6 rounded-xl border-2 transition-all duration-300 text-left ${
+                selectedMode === mode.id ? 'border-brand shadow-brand' : 'border-brand/30'
               }`}
             >
-              <h3 className="font-orbitron font-bold text-white mb-2">{mode.label}</h3>
-              <p className="text-cyber-text-secondary text-sm">{mode.description}</p>
+              <h3 className="font-display font-bold text-white mb-2">{mode.label}</h3>
+              <p className="text-muted-foreground text-sm">{mode.description}</p>
             </button>
           ))}
         </div>
       </motion.div>
 
       {/* Interview Interface */}
-      <motion.div variants={itemVariants} className="glass-card-cyber p-8 rounded-xl border-2">
+      <motion.div variants={itemVariants} className="saas-card p-8 rounded-xl border-2">
         <div className="space-y-6">
           {/* Current Question */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-orbitron font-bold text-white">
+              <h3 className="text-xl font-display font-bold text-white">
                 Question {currentQuestion + 1}
               </h3>
-              <div className="flex items-center gap-2 text-cyber-text-secondary">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <Clock className="w-4 h-4" />
                 <span>{Math.floor(timeElapsed / 60)}:{String(timeElapsed % 60).padStart(2, '0')}</span>
               </div>
             </div>
-            <p className="text-lg text-cyber-text mb-6 leading-relaxed">
+            <p className="text-lg text-foreground mb-6 leading-relaxed">
               {questions[currentQuestion]}
             </p>
           </div>
 
           {/* Recording Controls */}
-          <div className="border-t border-cyber-red/20 pt-6">
+          <div className="border-t border-brand/20 pt-6">
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
               <button
                 onClick={() => setIsRecording(!isRecording)}
                 className={`flex items-center gap-2 px-8 py-3 rounded-lg font-semibold transition-all duration-300 ${
                   isRecording
-                    ? 'bg-cyber-red/30 border border-cyber-red shadow-glow text-cyber-red'
-                    : 'bg-cyber-red border border-cyber-red shadow-glow text-white'
+                    ? 'bg-brand/30 border border-brand shadow-brand text-brand'
+                    : 'bg-brand border border-brand shadow-brand text-white'
                 }`}
               >
                 {isRecording ? (
@@ -142,7 +142,7 @@ export function InterviewSimulator() {
                 )}
               </button>
 
-              <button className="flex items-center gap-2 px-6 py-3 rounded-lg border border-cyber-red/50 text-cyber-text hover:bg-cyber-red/10 transition-colors">
+              <button className="flex items-center gap-2 px-6 py-3 rounded-lg border border-brand/50 text-foreground hover:bg-brand/10 transition-colors">
                 <Volume2 className="w-5 h-5" />
                 Listen Again
               </button>
@@ -151,31 +151,31 @@ export function InterviewSimulator() {
 
           {/* Your Answer Area */}
           <div>
-            <label className="block text-sm font-orbitron text-cyber-text-secondary mb-3">
+            <label className="block text-sm font-display text-muted-foreground mb-3">
               Your Answer
             </label>
             <textarea
-              className="w-full h-32 bg-black/40 border border-cyber-red/30 rounded-lg px-4 py-3 text-white focus:border-cyber-red focus:outline-none focus:shadow-glow transition-all duration-300"
+              className="w-full h-32 bg-black/40 border border-brand/30 rounded-lg px-4 py-3 text-white focus:border-brand focus:outline-none focus:shadow-brand transition-all duration-300"
               placeholder="Type your answer or speak into the microphone..."
             />
           </div>
 
           {/* AI Feedback Preview */}
-          <div className="bg-black/40 border border-cyber-red/30 rounded-lg p-4 space-y-3">
+          <div className="bg-black/40 border border-brand/30 rounded-lg p-4 space-y-3">
             <div className="flex items-start gap-3">
               <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm font-semibold text-white">Strong Points</p>
-                <p className="text-xs text-cyber-text-secondary mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Good structure and clear articulation of your approach
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-cyber-red flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-brand flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm font-semibold text-white">Areas to Improve</p>
-                <p className="text-xs text-cyber-text-secondary mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Could provide more specific examples and technical depth
                 </p>
               </div>
@@ -184,17 +184,17 @@ export function InterviewSimulator() {
         </div>
 
         {/* Navigation */}
-        <div className="flex items-center justify-between mt-8 pt-6 border-t border-cyber-red/20">
+        <div className="flex items-center justify-between mt-8 pt-6 border-t border-brand/20">
           <button
             disabled={currentQuestion === 0}
             onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
-            className="px-6 py-2 rounded-lg border border-cyber-red/50 text-cyber-text disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyber-red/10 transition-colors"
+            className="px-6 py-2 rounded-lg border border-brand/50 text-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand/10 transition-colors"
           >
             Previous
           </button>
 
           <div className="text-center">
-            <p className="text-cyber-text-secondary text-sm">
+            <p className="text-muted-foreground text-sm">
               {currentQuestion + 1} of {questions.length}
             </p>
           </div>
@@ -205,7 +205,7 @@ export function InterviewSimulator() {
                 setCurrentQuestion(currentQuestion + 1);
               }
             }}
-            className="px-6 py-2 rounded-lg bg-cyber-red border border-cyber-red text-white hover:shadow-glow transition-all duration-300"
+            className="px-6 py-2 rounded-lg bg-brand border border-brand text-white hover:shadow-brand transition-all duration-300"
           >
             {currentQuestion === questions.length - 1 ? 'Finish' : 'Next'}
           </button>
@@ -213,8 +213,8 @@ export function InterviewSimulator() {
       </motion.div>
 
       {/* Performance Summary */}
-      <motion.div variants={itemVariants} className="glass-card-cyber p-6 rounded-xl border-2">
-        <h3 className="text-xl font-orbitron font-bold text-white mb-6">Performance Metrics</h3>
+      <motion.div variants={itemVariants} className="saas-card p-6 rounded-xl border-2">
+        <h3 className="text-xl font-display font-bold text-white mb-6">Performance Metrics</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'Clarity', score: 82 },
@@ -223,16 +223,16 @@ export function InterviewSimulator() {
             { label: 'Communication', score: 85 },
           ].map((metric, i) => (
             <div key={i} className="bg-black/40 rounded-lg p-4">
-              <p className="text-cyber-text-secondary text-sm mb-2">{metric.label}</p>
-              <div className="relative h-2 bg-cyber-red/20 rounded-full overflow-hidden">
+              <p className="text-muted-foreground text-sm mb-2">{metric.label}</p>
+              <div className="relative h-2 bg-brand/20 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-cyber-red to-cyber-red-glow rounded-full"
+                  className="h-full bg-gradient-to-r from-brand to-brand-light rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${metric.score}%` }}
                   transition={{ duration: 1.5, ease: 'easeOut' }}
                 />
               </div>
-              <p className="text-white font-orbitron text-sm mt-2">{metric.score}%</p>
+              <p className="text-white font-display text-sm mt-2">{metric.score}%</p>
             </div>
           ))}
         </div>

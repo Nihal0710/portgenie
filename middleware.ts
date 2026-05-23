@@ -35,6 +35,6 @@ export default clerkMiddleware({
 
 export const config = {
   matcher: [
-    "/((?!_next|favicon.ico|images/|site.webmanifest|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp)$).*)",
+    "/((?!_next|favicon.ico|icon.svg|images/|site.webmanifest|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp)$).*)",
   ],
 };

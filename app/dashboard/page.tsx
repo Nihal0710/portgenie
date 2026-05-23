@@ -1,148 +1,161 @@
-"use client";
+"use client"
 
-import { motion } from 'framer-motion';
+import Link from "next/link"
+import { motion } from "framer-motion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BarChart3, Grid3X3, Zap, Brain, Users, Shield } from "lucide-react"
+import {
+  BarChart3,
+  Brain,
+  CheckCircle2,
+  Grid3X3,
+  Mic,
+  Shield,
+  TrendingUp,
+  Users,
+} from "lucide-react"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardCards } from "@/components/dashboard/dashboard-cards"
 import { DashboardAnalytics } from "@/components/dashboard/dashboard-analytics"
 import { SkillGapAnalyzer } from "@/components/ai/skill-gap-analyzer"
 import { InterviewSimulator } from "@/components/ai/interview-simulator"
 import { RecruiterDashboard } from "@/components/recruiter/recruiter-dashboard"
+import { cn } from "@/lib/utils"
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
+const statCards = [
+  { label: "Recruiter visibility", value: "847", change: "+24%", icon: Users },
+  { label: "ATS score", value: "92", change: "+8 pts", icon: TrendingUp },
+  { label: "Portfolio strength", value: "88%", change: "Strong", icon: BarChart3 },
+  {
+    label: "Verification",
+    value: "Active",
+    change: "On-chain",
+    icon: Shield,
+    success: true,
   },
-};
+]
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6 },
-  },
-};
+const quickActions = [
+  { label: "Upload resume", href: "/dashboard/upload-resume", icon: "📄" },
+  { label: "Import GitHub", href: "/dashboard/portfolio", icon: "⭐" },
+  { label: "Interview prep", href: "/dashboard", icon: "🎤" },
+  { label: "Portfolio score", href: "/dashboard", icon: "📊" },
+]
 
 export default function DashboardPage() {
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'ai-analyzer', label: 'AI Analyzer', icon: Brain },
-    { id: 'interview', label: 'Interview Prep', icon: Zap },
-    { id: 'recruiter', label: 'Recruiter View', icon: Users },
-    { id: 'tools', label: 'Tools', icon: Grid3X3 },
-  ];
+    { id: "overview", label: "Overview", icon: BarChart3 },
+    { id: "ai-analyzer", label: "AI Analyzer", icon: Brain },
+    { id: "interview", label: "Interview", icon: Mic },
+    { id: "recruiter", label: "Recruiter", icon: Users },
+    { id: "tools", label: "Tools", icon: Grid3X3 },
+  ]
 
   return (
-    <div className="min-h-screen bg-cyber-bg text-cyber-text">
-      {/* Background elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-cyber-red/10 rounded-full blur-3xl opacity-20"></div>
-        <div className="absolute bottom-0 -left-40 w-96 h-96 bg-cyber-red/5 rounded-full blur-3xl opacity-15"></div>
-      </div>
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 lg:px-8">
+        <DashboardHeader
+          title="Career intelligence"
+          description="Build. Verify. Analyze. Get Hired."
+        />
 
-      <motion.div
-        className="relative container mx-auto space-y-6 px-4 py-6 lg:px-6 pt-24"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Header */}
-        <motion.div variants={itemVariants}>
-          <DashboardHeader title="PortGenie 2.0" description="Your AI-powered career operating system" />
-        </motion.div>
-
-        {/* Tabs Section */}
-        <motion.div variants={itemVariants} className="glass-card-cyber p-6 rounded-xl border-2">
-          <Tabs defaultValue="overview" className="space-y-6">
-            <div className="flex overflow-x-auto pb-2">
-              <TabsList className="grid grid-cols-5 w-full bg-transparent gap-2">
-                {tabs.map((tab) => {
-                  const Icon = tab.icon;
-                  return (
-                    <TabsTrigger
-                      key={tab.id}
-                      value={tab.id}
-                      className="rounded-lg border border-cyber-red/30 data-[state=active]:border-cyber-red data-[state=active]:bg-cyber-red/10 data-[state=active]:shadow-glow transition-all duration-300 flex items-center gap-2 text-sm whitespace-nowrap"
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span className="hidden sm:inline">{tab.label}</span>
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-            </div>
-
-            {/* Overview Tab */}
-            <TabsContent value="overview" className="space-y-6 pt-4">
-              <motion.div variants={itemVariants}>
-                <DashboardAnalytics />
-              </motion.div>
-            </TabsContent>
-
-            {/* AI Analyzer Tab */}
-            <TabsContent value="ai-analyzer" className="space-y-6 pt-4">
-              <motion.div variants={itemVariants}>
-                <SkillGapAnalyzer />
-              </motion.div>
-            </TabsContent>
-
-            {/* Interview Prep Tab */}
-            <TabsContent value="interview" className="space-y-6 pt-4">
-              <motion.div variants={itemVariants}>
-                <InterviewSimulator />
-              </motion.div>
-            </TabsContent>
-
-            {/* Recruiter View Tab */}
-            <TabsContent value="recruiter" className="space-y-6 pt-4">
-              <motion.div variants={itemVariants}>
-                <RecruiterDashboard />
-              </motion.div>
-            </TabsContent>
-
-            {/* Tools Tab */}
-            <TabsContent value="tools" className="space-y-6 pt-4">
-              <motion.div variants={itemVariants}>
-                <div className="mb-6">
-                  <h2 className="text-2xl font-orbitron font-bold text-white">Portfolio Tools</h2>
-                  <p className="text-cyber-text-secondary">Create and manage your professional presence</p>
+        {/* KPI row */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {statCards.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="saas-card p-5"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                    {stat.label}
+                  </p>
+                  <p className="mt-2 font-display text-2xl font-semibold">{stat.value}</p>
+                  <p
+                    className={cn(
+                      "mt-1 text-xs font-medium",
+                      stat.success ? "text-success" : "text-brand-light"
+                    )}
+                  >
+                    {stat.change}
+                  </p>
                 </div>
-                <DashboardCards />
-              </motion.div>
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/50 border border-border">
+                  <stat.icon className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
+              {stat.label === "Portfolio strength" && (
+                <div className="mt-4 h-1 rounded-full bg-muted overflow-hidden">
+                  <div className="h-full w-[88%] rounded-full bg-brand" />
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="saas-panel p-1">
+          <Tabs defaultValue="overview" className="space-y-6 p-4 md:p-6">
+            <TabsList className="flex h-auto w-full flex-wrap gap-1 bg-muted/40 p-1 rounded-lg border border-border">
+              {tabs.map((tab) => (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className="flex-1 min-w-[100px] gap-2 rounded-md data-[state=active]:bg-accent data-[state=active]:text-foreground text-muted-foreground"
+                >
+                  <tab.icon className="h-4 w-4" />
+                  <span className="hidden sm:inline text-sm">{tab.label}</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            <TabsContent value="overview" className="mt-0">
+              <DashboardAnalytics />
+            </TabsContent>
+            <TabsContent value="ai-analyzer">
+              <SkillGapAnalyzer />
+            </TabsContent>
+            <TabsContent value="interview">
+              <InterviewSimulator />
+            </TabsContent>
+            <TabsContent value="recruiter">
+              <RecruiterDashboard />
+            </TabsContent>
+            <TabsContent value="tools" className="space-y-6">
+              <div>
+                <h2 className="font-display text-lg font-semibold">Portfolio tools</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Create and manage your professional presence
+                </p>
+              </div>
+              <DashboardCards />
             </TabsContent>
           </Tabs>
-        </motion.div>
+        </div>
 
-        {/* Quick Actions Section */}
-        <motion.div variants={itemVariants} className="glass-card-cyber p-6 rounded-xl border-2">
-          <h3 className="text-xl font-orbitron font-bold text-white mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { label: 'Upload Resume', icon: '📄', color: 'from-cyber-red to-cyber-red-glow' },
-              { label: 'Import GitHub', icon: '⭐', color: 'from-cyan-500 to-blue-500' },
-              { label: 'Start Interview', icon: '🎤', color: 'from-purple-500 to-pink-500' },
-              { label: 'Get Portfolio Score', icon: '📊', color: 'from-green-500 to-emerald-500' },
-            ].map((action, i) => (
-              <motion.button
-                key={i}
-                className={`p-4 rounded-lg bg-gradient-to-br ${action.color} opacity-20 hover:opacity-40 border border-white/20 text-white font-semibold transition-all duration-300 group`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+        <div className="saas-card p-6">
+          <h3 className="font-display text-base font-semibold mb-4">Quick actions</h3>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {quickActions.map((action) => (
+              <Link
+                key={action.label}
+                href={action.href}
+                className="flex items-center gap-3 rounded-lg border border-border bg-card p-4 text-sm font-medium transition-colors hover:border-border/80 hover:bg-accent"
               >
-                <span className="text-2xl mb-2 block group-hover:scale-110 transition-transform">{action.icon}</span>
+                <span className="text-xl">{action.icon}</span>
                 {action.label}
-              </motion.button>
+              </Link>
             ))}
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <CheckCircle2 className="h-4 w-4 text-success" />
+          Profile completion: 76% — add projects to reach 100%
+        </div>
+      </div>
     </div>
   )
 }
-

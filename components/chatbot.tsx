@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
-import Image from "next/image"
+import { LogoMark } from "@/components/layout/logo"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   X,
@@ -227,27 +227,20 @@ export function Chatbot() {
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
             className="w-[min(100vw-2rem,24rem)] sm:w-96"
           >
-            <div className="glass-card-cyber animated-gradient-border overflow-hidden shadow-glow-lg flex flex-col h-[min(85vh,640px)]">
+            <div className="saas-card overflow-hidden shadow-card flex flex-col h-[min(85vh,640px)]">
               {/* Header */}
-              <div className="relative shrink-0 px-4 py-3 border-b border-cyber-red/30 bg-gradient-to-r from-black/80 via-cyber-red/10 to-black/80">
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyber-red to-transparent opacity-60" />
+              <div className="relative shrink-0 px-4 py-3 border-b border-border bg-card">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="relative h-10 w-10 shrink-0 rounded-lg overflow-hidden ring-2 ring-cyber-red/40 shadow-glow">
-                      <Image
-                        src="/images/logo.png"
-                        alt="Genie"
-                        fill
-                        className="object-cover"
-                        sizes="40px"
-                      />
-                      <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-black" />
+                    <div className="relative shrink-0">
+                      <LogoMark size={36} />
+                      <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-success ring-2 ring-card" />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-orbitron text-sm font-bold text-glow truncate">
+                      <p className="font-display text-sm font-semibold truncate">
                         Genie
                       </p>
-                      <p className="text-[11px] text-cyber-text-secondary flex items-center gap-1">
+                      <p className="text-[11px] text-muted-foreground flex items-center gap-1">
                         <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         Online · Portfolio AI
                       </p>
@@ -261,12 +254,12 @@ export function Chatbot() {
                             variant="ghost"
                             size="icon"
                             onClick={clearHistory}
-                            className="h-8 w-8 text-cyber-text-secondary hover:text-cyber-red hover:bg-cyber-red/10"
+                            className="h-8 w-8 text-muted-foreground hover:text-brand hover:bg-brand/10"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent side="bottom" className="glass-card-cyber border-cyber-red/30">
+                        <TooltipContent side="bottom" className="saas-card border-brand/30">
                           Clear chat
                         </TooltipContent>
                       </Tooltip>
@@ -276,12 +269,12 @@ export function Chatbot() {
                             variant="ghost"
                             size="icon"
                             onClick={minimizeChat}
-                            className="h-8 w-8 text-cyber-text-secondary hover:text-white hover:bg-white/10"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent"
                           >
                             <Minus className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent side="bottom" className="glass-card-cyber border-cyber-red/30">
+                        <TooltipContent side="bottom" className="saas-card border-brand/30">
                           Minimize
                         </TooltipContent>
                       </Tooltip>
@@ -291,12 +284,12 @@ export function Chatbot() {
                             variant="ghost"
                             size="icon"
                             onClick={() => setIsOpen(false)}
-                            className="h-8 w-8 text-cyber-text-secondary hover:text-white hover:bg-white/10"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent"
                           >
                             <X className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent side="bottom" className="glass-card-cyber border-cyber-red/30">
+                        <TooltipContent side="bottom" className="saas-card border-brand/30">
                           Close
                         </TooltipContent>
                       </Tooltip>
@@ -328,14 +321,14 @@ export function Chatbot() {
                         className={cn(
                           "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
                           message.role === "assistant"
-                            ? "bg-cyber-red/20 ring-1 ring-cyber-red/40"
+                            ? "bg-brand/20 ring-1 ring-brand/40"
                             : "bg-white/10 ring-1 ring-white/20"
                         )}
                       >
                         {message.role === "assistant" ? (
-                          <Bot className="h-4 w-4 text-cyber-red" />
+                          <Bot className="h-4 w-4 text-brand" />
                         ) : (
-                          <User className="h-4 w-4 text-cyber-red-glow" />
+                          <User className="h-4 w-4 text-brand-light" />
                         )}
                       </div>
                       <div
@@ -348,8 +341,8 @@ export function Chatbot() {
                           className={cn(
                             "px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed",
                             message.role === "user"
-                              ? "bg-gradient-to-br from-cyber-red to-cyber-red-dark text-white rounded-br-md shadow-glow"
-                              : "bg-black/50 border border-cyber-red/20 text-cyber-text rounded-bl-md"
+                              ? "bg-gradient-to-br from-brand to-brand-dark text-white rounded-br-md shadow-brand"
+                              : "bg-muted border border-border text-foreground rounded-bl-md"
                           )}
                         >
                           {message.isTyping ? (
@@ -357,16 +350,16 @@ export function Chatbot() {
                               {[0, 150, 300].map((delay) => (
                                 <span
                                   key={delay}
-                                  className="h-2 w-2 rounded-full bg-cyber-red animate-bounce"
+                                  className="h-2 w-2 rounded-full bg-brand animate-bounce"
                                   style={{ animationDelay: `${delay}ms` }}
                                 />
                               ))}
-                              <span className="text-xs text-cyber-text-secondary ml-2">
+                              <span className="text-xs text-muted-foreground ml-2">
                                 Genie is thinking…
                               </span>
                             </div>
                           ) : (
-                            <p className="whitespace-pre-wrap [&_strong]:text-cyber-red-glow [&_strong]:font-semibold">
+                            <p className="whitespace-pre-wrap [&_strong]:text-brand-light [&_strong]:font-semibold">
                               {message.content.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
                                 part.startsWith("**") && part.endsWith("**") ? (
                                   <strong key={i}>{part.slice(2, -2)}</strong>
@@ -378,7 +371,7 @@ export function Chatbot() {
                           )}
                         </div>
                         {!message.isTyping && (
-                          <span className="text-[10px] text-cyber-text-secondary/70 px-1">
+                          <span className="text-[10px] text-muted-foreground/70 px-1">
                             {formatTime(message.timestamp)}
                           </span>
                         )}
@@ -401,7 +394,7 @@ export function Chatbot() {
                       key={prompt}
                       type="button"
                       onClick={() => sendMessage(prompt)}
-                      className="text-[11px] px-2.5 py-1.5 rounded-full border border-cyber-red/30 bg-cyber-red/5 text-cyber-text-secondary hover:text-white hover:border-cyber-red/60 hover:bg-cyber-red/15 transition-colors"
+                      className="text-[11px] px-2.5 py-1.5 rounded-full border border-brand/30 bg-brand/5 text-muted-foreground hover:text-white hover:border-brand/60 hover:bg-brand/15 transition-colors"
                     >
                       {prompt}
                     </button>
@@ -410,7 +403,7 @@ export function Chatbot() {
               )}
 
               {/* Input */}
-              <div className="shrink-0 p-3 pt-2 border-t border-cyber-red/20 bg-black/40">
+              <div className="shrink-0 p-3 pt-2 border-t border-border bg-card/50">
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
                     <Input
@@ -422,9 +415,9 @@ export function Chatbot() {
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
                       disabled={isLoading}
-                      className="h-11 pr-10 bg-black/60 border-cyber-red/25 text-white placeholder:text-cyber-text-secondary/60 focus-visible:ring-cyber-red/50 focus-visible:border-cyber-red/50 rounded-xl"
+                      className="h-11 pr-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-brand/50 focus-visible:border-brand/50 rounded-xl"
                     />
-                    <Zap className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cyber-red/40 pointer-events-none" />
+                    <Zap className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand/40 pointer-events-none" />
                   </div>
                   <Button
                     size="icon"
@@ -433,8 +426,8 @@ export function Chatbot() {
                     className={cn(
                       "h-11 w-11 shrink-0 rounded-xl transition-all duration-200",
                       input.trim()
-                        ? "bg-gradient-to-br from-cyber-red to-cyber-red-dark hover:shadow-glow text-white"
-                        : "bg-white/5 text-cyber-text-secondary border border-white/10"
+                        ? "bg-gradient-to-br from-brand to-brand-dark hover:shadow-brand text-white"
+                        : "bg-white/5 text-muted-foreground border border-white/10"
                     )}
                   >
                     {isLoading ? (
@@ -444,7 +437,7 @@ export function Chatbot() {
                     )}
                   </Button>
                 </div>
-                <p className="text-[10px] text-center text-cyber-text-secondary/50 mt-2">
+                <p className="text-[10px] text-center text-muted-foreground/50 mt-2">
                   Powered by Gemini · PortGenie 2.0
                 </p>
               </div>
@@ -458,26 +451,16 @@ export function Chatbot() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             onClick={toggleChat}
-            className="flex items-center gap-3 pl-2 pr-4 py-2 rounded-full glass-card-cyber border border-cyber-red/40 shadow-glow hover:border-cyber-red/70 transition-all group"
+            className="flex items-center gap-3 pl-2 pr-4 py-2 rounded-full saas-card shadow-card hover:shadow-card-hover transition-all"
           >
-            <div className="relative h-10 w-10 rounded-full overflow-hidden ring-2 ring-cyber-red/50">
-              <Image
-                src="/images/logo.png"
-                alt="Genie"
-                fill
-                className="object-cover"
-                sizes="40px"
-              />
-            </div>
+            <LogoMark size={36} />
             <div className="text-left">
-              <p className="text-sm font-orbitron font-semibold text-glow group-hover:text-glow-lg transition-all">
-                Genie
-              </p>
-              <p className="text-[11px] text-cyber-text-secondary">
+              <p className="text-sm font-display font-semibold">Genie</p>
+              <p className="text-[11px] text-muted-foreground">
                 Tap to continue chat
               </p>
             </div>
-            <MessageSquare className="h-4 w-4 text-cyber-red ml-1" />
+            <MessageSquare className="h-4 w-4 text-brand ml-1" />
           </motion.button>
         ) : (
           <motion.div
@@ -487,24 +470,12 @@ export function Chatbot() {
             exit={{ scale: 0 }}
             className="relative"
           >
-            {!hasInteracted && (
-              <span className="absolute inset-0 rounded-full bg-cyber-red/30 animate-ping" />
-            )}
             <Button
               onClick={toggleChat}
-              className="relative h-14 w-14 rounded-full p-0 overflow-hidden bg-gradient-to-br from-cyber-red to-cyber-red-dark hover:shadow-glow-lg border border-cyber-red-glow/50 transition-all duration-300 hover:scale-105"
+              className="relative h-14 w-14 rounded-full p-2 bg-card border border-border hover:border-brand/40 hover:shadow-brand transition-all duration-200"
               aria-label="Open PortGenie AI chat"
             >
-              <Image
-                src="/images/logo.png"
-                alt=""
-                width={56}
-                height={56}
-                className="object-cover opacity-90"
-              />
-              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black ring-2 ring-cyber-red">
-                <Sparkles className="h-3 w-3 text-cyber-red-glow" />
-              </span>
+              <LogoMark size={40} />
             </Button>
             {!hasInteracted && (
               <motion.div
@@ -513,8 +484,8 @@ export function Chatbot() {
                 transition={{ delay: 0.8 }}
                 className="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap hidden sm:block"
               >
-                <div className="glass-card-cyber px-3 py-2 rounded-lg border border-cyber-red/30 text-xs text-cyber-text-secondary shadow-glow">
-                  Need portfolio help? <span className="text-cyber-red font-medium">Ask Genie</span>
+                <div className="saas-card px-3 py-2 text-xs text-muted-foreground">
+                  Need help? <span className="text-brand font-medium">Ask Genie</span>
                 </div>
               </motion.div>
             )}

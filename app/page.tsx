@@ -1,414 +1,304 @@
-﻿"use client";
+﻿"use client"
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { useState, useEffect } from 'react';
-import { useAuth } from '@clerk/nextjs';
-import { ArrowRight, Zap, Shield, Network, Cpu, Sparkles, ChevronDown, Github, Linkedin, Twitter } from 'lucide-react';
-import { motion } from 'framer-motion';
+import Link from "next/link"
+import { useAuth } from "@clerk/nextjs"
+import { motion } from "framer-motion"
+import {
+  ArrowRight,
+  BarChart3,
+  Brain,
+  CheckCircle2,
+  Github,
+  Linkedin,
+  Mic,
+  Shield,
+  Sparkles,
+  Target,
+} from "lucide-react"
+import { LogoMark } from "@/components/layout/logo"
 
-// Animated Background Component The best one can find on the internet, made with love and 100% custom CSS and React code, no templates or libraries used for the background (except framer-motion for animations)
-function CyberpunkBackground() {
-  return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none">
-      {/* Main glow orbs */}
-      <div className="absolute -top-40 -left-40 w-80 h-80 bg-cyber-red/20 rounded-full blur-3xl opacity-30 animate-float"></div>
-      <div className="absolute top-1/2 -right-40 w-96 h-96 bg-cyber-red-glow/15 rounded-full blur-3xl opacity-20 animate-float floating-delay"></div>
-      <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-cyber-red/10 rounded-full blur-3xl opacity-15"></div>
-      
-      {/* Grid pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'linear-gradient(rgba(255, 0, 60, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 0, 60, 0.1) 1px, transparent 1px)',
-          backgroundSize: '50px 50px',
-        }}></div>
-      </div>
-    </div>
-  );
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+  }),
 }
 
-// Floating particles
-function FloatingParticles() {
-  return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none">
-      {[...Array(20)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 bg-cyber-red/40 rounded-full"
-          animate={{
-            y: [0, -100, 0],
-            x: [0, Math.random() * 50 - 25, 0],
-            opacity: [0, 1, 0],
-          }}
-          transition={{
-            duration: Math.random() * 3 + 2,
-            repeat: Infinity,
-            delay: Math.random() * 2,
-          }}
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
+const features = [
+  {
+    icon: Brain,
+    title: "AI Skill Gap Analyzer",
+    description:
+      "Identify missing skills and get a clear roadmap to become interview-ready.",
+  },
+  {
+    icon: BarChart3,
+    title: "Recruiter Analytics",
+    description:
+      "Understand how recruiters view your profile with visibility and ATS insights.",
+  },
+  {
+    icon: Mic,
+    title: "AI Interview Simulator",
+    description:
+      "Practice role-specific questions with structured feedback before the real call.",
+  },
+  {
+    icon: Github,
+    title: "GitHub & LinkedIn Import",
+    description:
+      "Pull projects and experience automatically into a polished portfolio.",
+  },
+  {
+    icon: Target,
+    title: "Portfolio Review Score",
+    description:
+      "AI grades clarity, impact, and presentation — with actionable improvements.",
+  },
+  {
+    icon: Shield,
+    title: "Credential Verification",
+    description:
+      "Blockchain-backed proof for certificates, resumes, and professional identity.",
+  },
+]
+
+const metrics = [
+  { label: "ATS Score", value: "92", trend: "+8%" },
+  { label: "Recruiter Views", value: "847", trend: "+24%" },
+  { label: "Profile Strength", value: "88%", trend: "Strong" },
+]
 
 export default function Home() {
-  const { isLoaded, userId } = useAuth();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    if (isLoaded) {
-      setIsAuthenticated(!!userId);
-    }
-  }, [isLoaded, userId]);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: "easeOut" },
-    },
-  };
+  const { isLoaded, isSignedIn } = useAuth()
 
   return (
-    <div className="w-full bg-cyber-bg text-cyber-text overflow-hidden">
-      <CyberpunkBackground />
-      <FloatingParticles />
+    <div className="relative w-full overflow-hidden pt-[4.25rem] bg-background">
+      <div className="pointer-events-none fixed inset-0 bg-hero-gradient mesh-bg opacity-80" />
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center py-20 px-4 md:px-6">
-        <div className="absolute inset-0 pointer-events-none">
-          <motion.div
-            className="absolute top-1/4 right-1/4 w-72 h-72 bg-gradient-to-br from-cyber-red/30 to-transparent rounded-full blur-3xl"
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 4, repeat: Infinity }}
-          ></motion.div>
-        </div>
-
-        <motion.div
-          className="container mx-auto px-4 md:px-6 max-w-6xl relative z-10"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <motion.div variants={itemVariants} className="flex flex-col gap-8">
-              <div className="space-y-4">
-                <motion.div
-                  variants={itemVariants}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyber-red/40 bg-black/50 backdrop-blur-sm w-fit"
-                >
-                  <Sparkles className="w-4 h-4 text-cyber-red" />
-                  <span className="text-sm font-medium text-cyber-red">AI + Web3 Platform</span>
-                </motion.div>
-
-                <motion.h1
-                  variants={itemVariants}
-                  className="text-5xl md:text-7xl font-orbitron font-bold leading-tight"
-                >
-                  <span className="text-glow-lg">Build Your Verified</span>
-                  <br />
-                  <span className="bg-gradient-to-r from-cyber-red via-cyber-red-glow to-cyber-red bg-clip-text text-transparent">
-                    AI Career Identity
-                  </span>
-                </motion.h1>
-
-                <motion.p
-                  variants={itemVariants}
-                  className="text-xl text-cyber-text-secondary leading-relaxed max-w-xl"
-                >
-                  AI + Web3 powered professional ecosystem for the next generation. Build portfolios, verify credentials, analyze skills, and get hired.
-                </motion.p>
-              </div>
-
-              {/* CTA Buttons */}
-              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                {isLoaded && isAuthenticated ? (
-                  <Link href="/dashboard" className="flex-1 sm:flex-none">
-                    <button className="btn-neon w-full">
-                      <span className="flex items-center justify-center gap-2">
-                        Go to Dashboard
-                        <ArrowRight className="w-4 h-4" />
-                      </span>
-                    </button>
-                  </Link>
-                ) : (
-                  <>
-                    <Link href="/sign-up" className="flex-1 sm:flex-none">
-                      <button className="btn-neon w-full">
-                        <span className="flex items-center justify-center gap-2">
-                          Get Started
-                          <ArrowRight className="w-4 h-4" />
-                        </span>
-                      </button>
-                    </Link>
-                    <Link href="/sign-in" className="flex-1 sm:flex-none">
-                      <button className="px-6 py-3 rounded-lg font-semibold font-orbitron border border-cyber-red/50 text-white hover:bg-cyber-red/10 transition-all duration-300 w-full">
-                        Sign In
-                      </button>
-                    </Link>
-                  </>
-                )}
-              </motion.div>
-
-              {/* Trust indicators */}
-              <motion.div variants={itemVariants} className="flex items-center gap-6 text-sm text-cyber-text-secondary">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-cyber-red glow-pulse"></div>
-                  <span>No credit card required</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-cyber-red glow-pulse"></div>
-                  <span>Free starter plan</span>
-                </div>
-              </motion.div>
-            </motion.div>
-
-            {/* Right Visual */}
+      {/* Hero */}
+      <section className="relative mx-auto max-w-7xl px-4 pb-24 pt-12 md:px-6 md:pt-20 lg:pb-32">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div>
             <motion.div
-              variants={itemVariants}
-              className="relative hidden md:flex items-center justify-center"
+              custom={0}
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1 text-xs text-muted-foreground"
             >
-              <div className="relative w-full aspect-square">
-                {/* Animated frame */}
-                <motion.div
-                  className="absolute inset-0 rounded-2xl border-2 border-cyber-red/30 animated-gradient-border"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                />
+              <Sparkles className="h-3.5 w-3.5 text-brand" />
+              Build. Verify. Analyze. Get Hired.
+            </motion.div>
 
-                {/* Content inside frame */}
-                <div className="absolute inset-4 rounded-xl bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl border border-cyber-red/20 p-8 overflow-hidden">
-                  <motion.div
-                    className="absolute -top-20 -right-20 w-40 h-40 bg-cyber-red/20 rounded-full blur-3xl"
-                    animate={{ y: [0, 20, 0] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                  />
+            <motion.h1
+              custom={1}
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              className="font-display text-4xl font-semibold leading-[1.1] tracking-tight md:text-5xl lg:text-6xl"
+            >
+              Build Your Verified{" "}
+              <span className="text-gradient-brand">AI Career Identity</span>
+            </motion.h1>
 
-                  <div className="relative z-10 space-y-6">
-                    {/* AI Score */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-cyber-text-secondary font-orbitron">AI Score</span>
-                        <span className="text-2xl font-bold text-cyber-red">92%</span>
-                      </div>
-                      <div className="w-full h-1 bg-cyber-red/20 rounded-full overflow-hidden">
-                        <motion.div
-                          className="h-full bg-gradient-to-r from-cyber-red to-cyber-red-glow"
-                          initial={{ width: 0 }}
-                          animate={{ width: "92%" }}
-                          transition={{ duration: 2, ease: "easeOut" }}
-                        />
-                      </div>
-                    </div>
+            <motion.p
+              custom={2}
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              className="mt-5 max-w-lg text-lg text-muted-foreground leading-relaxed"
+            >
+              AI-powered professional ecosystem for the next generation — portfolios,
+              recruiter intelligence, interview prep, and verified credentials in one
+              platform.
+            </motion.p>
 
-                    {/* Recruiter Visibility */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-cyber-text-secondary font-orbitron">Recruiter Visibility</span>
-                        <span className="text-2xl font-bold text-cyber-red">78%</span>
-                      </div>
-                      <div className="w-full h-1 bg-cyber-red/20 rounded-full overflow-hidden">
-                        <motion.div
-                          className="h-full bg-gradient-to-r from-cyber-red to-cyber-red-glow"
-                          initial={{ width: 0 }}
-                          animate={{ width: "78%" }}
-                          transition={{ duration: 2.5, ease: "easeOut", delay: 0.2 }}
-                        />
-                      </div>
-                    </div>
+            <motion.div
+              custom={3}
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              className="mt-8 flex flex-wrap gap-3"
+            >
+              <Link
+                href={isLoaded && isSignedIn ? "/dashboard" : "/sign-up"}
+                className="btn-brand"
+              >
+                Get Started
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link href="#platform" className="btn-brand-outline">
+                View Demo
+              </Link>
+            </motion.div>
 
-                    {/* Verified Credentials */}
-                    <div className="pt-4 border-t border-cyber-red/20">
-                      <div className="flex items-center gap-2 text-sm text-cyber-text-secondary">
-                        <Shield className="w-4 h-4 text-cyber-red" />
-                        <span>3 Verified Credentials</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <motion.div
+              custom={4}
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              className="mt-10 flex flex-wrap gap-6 text-sm text-muted-foreground"
+            >
+              {["No credit card", "Recruiter-ready", "AI-native"].map((item) => (
+                <span key={item} className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-success" />
+                  {item}
+                </span>
+              ))}
             </motion.div>
           </div>
 
-          {/* Scroll indicator */}
+          {/* Preview cards */}
           <motion.div
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="relative"
           >
-            <ChevronDown className="w-6 h-6 text-cyber-red" />
+            <div className="saas-panel p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <LogoMark size={28} />
+                  <span className="text-sm font-medium">Career Intelligence</span>
+                </div>
+                <span className="badge-success">Live</span>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {metrics.map((m) => (
+                  <div
+                    key={m.label}
+                    className="rounded-lg border border-border bg-muted/30 p-3"
+                  >
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      {m.label}
+                    </p>
+                    <p className="mt-1 font-display text-xl font-semibold">{m.value}</p>
+                    <p className="text-xs text-brand-light">{m.trend}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Portfolio strength</span>
+                  <span>88%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full bg-brand"
+                    initial={{ width: 0 }}
+                    animate={{ width: "88%" }}
+                    transition={{ delay: 0.6, duration: 1, ease: "easeOut" }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Verification</span>
+                  <span className="text-success flex items-center gap-1">
+                    <Shield className="h-3 w-3" /> Verified
+                  </span>
+                </div>
+              </div>
+            </div>
+            <motion.div
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -right-4 -bottom-4 saas-card p-4 max-w-[200px] hidden sm:block"
+            >
+              <p className="text-xs text-muted-foreground">Recruiter visibility</p>
+              <p className="text-2xl font-display font-semibold mt-1">↑ 24%</p>
+              <p className="text-[10px] text-muted-foreground mt-1">vs last month</p>
+            </motion.div>
           </motion.div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="relative py-20 px-4 md:px-6">
-        <div className="container mx-auto max-w-6xl">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-5xl font-orbitron font-bold mb-4">
-              <span className="gradient-text">Powerful Features</span>
+      {/* Features */}
+      <section id="features" className="relative border-t border-border py-24">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <div className="max-w-2xl mb-14">
+            <p className="text-sm font-medium text-brand mb-2">Platform</p>
+            <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight">
+              Everything you need to get hired
             </h2>
-            <p className="text-cyber-text-secondary text-lg max-w-2xl mx-auto">
-              Everything you need to build, verify, analyze, and get hired.
+            <p className="mt-4 text-muted-foreground text-lg">
+              Enterprise-grade AI tools designed for candidates and recruiters — not
+              gamers.
             </p>
-          </motion.div>
-
-          <motion.div
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {[
-              {
-                icon: Zap,
-                title: "AI Skill Analyzer",
-                description: "Analyze gaps between your skills and target roles. Get personalized roadmaps.",
-              },
-              {
-                icon: Cpu,
-                title: "Interview Simulator",
-                description: "Practice with AI-powered technical and HR interviews with voice support.",
-              },
-              {
-                icon: Network,
-                title: "Recruiter Dashboard",
-                description: "Connect with recruiters. Let them discover and verify your credentials.",
-              },
-              {
-                icon: Shield,
-                title: "Blockchain Verification",
-                description: "NFT-based verified certificates stored on Ethereum and IPFS.",
-              },
-              {
-                icon: Github,
-                title: "GitHub Integration",
-                description: "Auto-import your projects and repositories. Showcase real work.",
-              },
-              {
-                icon: Sparkles,
-                title: "Portfolio AI Review",
-                description: "Get AI-powered score for recruiter-friendliness and ATS compatibility.",
-              },
-            ].map((feature, index) => (
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f, i) => (
               <motion.div
-                key={index}
-                variants={itemVariants}
-                className="glass-card-cyber p-6 rounded-xl hover:shadow-glow transition-all duration-300 group"
+                key={f.title}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="saas-card p-6 group"
               >
-                <feature.icon className="w-10 h-10 text-cyber-red mb-4 group-hover:scale-110 transition-transform duration-300" />
-                <h3 className="text-xl font-orbitron font-bold text-white mb-2">{feature.title}</h3>
-                <p className="text-cyber-text-secondary text-sm">{feature.description}</p>
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-muted border border-brand/20">
+                  <f.icon className="h-5 w-5 text-brand" />
+                </div>
+                <h3 className="font-display text-lg font-semibold mb-2">{f.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {f.description}
+                </p>
               </motion.div>
             ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Call to Action Section */}
-      <section className="relative py-20 px-4 md:px-6">
-        <div className="container mx-auto max-w-6xl">
-          <motion.div
-            className="relative rounded-2xl overflow-hidden glass-card-cyber p-12 md:p-16 border-2"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-cyber-red/10 via-transparent to-cyber-red/10 pointer-events-none"></div>
-            
-            <div className="relative z-10 max-w-2xl mx-auto text-center">
-              <h2 className="text-4xl md:text-5xl font-orbitron font-bold mb-6">
-                Ready to Transform Your Career?
-              </h2>
-              <p className="text-cyber-text-secondary text-lg mb-8">
-                Join thousands of professionals building their verified AI career identity.
-              </p>
-              {!isAuthenticated && (
-                <Link href="/sign-up">
-                  <button className="btn-neon">
-                    <span className="flex items-center justify-center gap-2">
-                      Start Free Today
-                      <ArrowRight className="w-4 h-4" />
-                    </span>
-                  </button>
-                </Link>
-              )}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="relative border-t border-cyber-red/20 py-12 px-4 md:px-6">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h3 className="font-orbitron font-bold text-lg mb-4">PortGenie 2.0</h3>
-              <p className="text-cyber-text-secondary text-sm">Build. Verify. Analyze. Get Hired.</p>
-            </div>
-            {[
-              { title: "Product", links: ["Features", "Pricing", "Security"] },
-              { title: "Company", links: ["About", "Blog", "Careers"] },
-              { title: "Legal", links: ["Privacy", "Terms", "Contact"] },
-            ].map((col, i) => (
-              <div key={i}>
-                <h4 className="font-semibold text-white mb-4">{col.title}</h4>
-                <ul className="space-y-2">
-                  {col.links.map((link, j) => (
-                    <li key={j}>
-                      <a href="#" className="text-cyber-text-secondary hover:text-cyber-red transition-colors text-sm">
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
           </div>
+        </div>
+      </section>
 
-          <div className="border-t border-cyber-red/20 pt-8 flex flex-col md:flex-row items-center justify-between">
-            <p className="text-cyber-text-secondary text-sm">
-              {'\u00A9 '}{new Date().getFullYear()} PortGenie. All rights reserved.
+      {/* Platform CTA */}
+      <section id="platform" className="relative py-24">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <div className="saas-panel p-10 md:p-14 text-center">
+            <h2 className="font-display text-3xl md:text-4xl font-semibold max-w-2xl mx-auto">
+              Your career operating system, powered by AI
+            </h2>
+            <p className="mt-4 text-muted-foreground max-w-xl mx-auto text-lg">
+              Join professionals using PortGenie to stand out to recruiters with
+              data-backed portfolios and verified credentials.
             </p>
-            <div className="flex items-center gap-4 mt-4 md:mt-0">
-              <a href="#" className="text-cyber-text-secondary hover:text-cyber-red transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-cyber-text-secondary hover:text-cyber-red transition-colors">
-                <Github className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-cyber-text-secondary hover:text-cyber-red transition-colors">
-                <Linkedin className="w-5 h-5" />
-              </a>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link href="/sign-up" className="btn-brand">
+                Start free
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link href="/sign-in" className="btn-brand-outline">
+                Sign in
+              </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing placeholder */}
+      <section id="pricing" className="relative border-t border-border py-24">
+        <div className="mx-auto max-w-7xl px-4 md:px-6 text-center">
+          <h2 className="font-display text-3xl font-semibold">Simple, transparent pricing</h2>
+          <p className="mt-3 text-muted-foreground">
+            Start free. Upgrade when you&apos;re ready to unlock advanced AI analytics.
+          </p>
+          <Link href="/dashboard/upgrade" className="btn-brand-outline mt-8 inline-flex">
+            View plans
+          </Link>
+        </div>
+      </section>
+
+      <footer className="border-t border-border py-12">
+        <div className="mx-auto max-w-7xl px-4 md:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <LogoMark size={28} />
+          <p className="text-sm text-muted-foreground">
+            © {new Date().getFullYear()} PortGenie 2.0. All rights reserved.
+          </p>
+          <div className="flex gap-4 text-muted-foreground">
+            <Linkedin className="h-4 w-4 hover:text-foreground cursor-pointer transition-colors" />
+            <Github className="h-4 w-4 hover:text-foreground cursor-pointer transition-colors" />
           </div>
         </div>
       </footer>
     </div>
-  );
+  )
 }

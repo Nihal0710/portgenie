@@ -90,7 +90,7 @@ export function FeaturesShowcase() {
   return (
     <section className="py-20 px-4 md:px-6 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-40 right-1/4 w-80 h-80 bg-cyber-red/5 rounded-full blur-3xl opacity-20"></div>
+        <div className="absolute -top-40 right-1/4 w-80 h-80 bg-brand/5 rounded-full blur-3xl opacity-20"></div>
       </div>
 
       <motion.div
@@ -105,10 +105,10 @@ export function FeaturesShowcase() {
           className="text-center mb-16 space-y-4"
           variants={itemVariants}
         >
-          <h2 className="text-4xl md:text-5xl font-orbitron font-bold">
+          <h2 className="text-4xl md:text-5xl font-display font-bold">
             <span className="gradient-text">Powerful AI Features</span>
           </h2>
-          <p className="text-cyber-text-secondary text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Everything you need to build, verify, analyze, and get hired with cutting-edge AI technology.
           </p>
         </motion.div>
@@ -123,7 +123,7 @@ export function FeaturesShowcase() {
             return (
               <motion.div
                 key={index}
-                className="glass-card-cyber p-6 rounded-xl border-2 group relative overflow-hidden"
+                className="saas-card p-6 rounded-xl border-2 group relative overflow-hidden"
                 variants={itemVariants}
                 whileHover={{ y: -8, scale: 1.02 }}
                 transition={{ duration: 0.3 }}
@@ -138,26 +138,26 @@ export function FeaturesShowcase() {
                   className="mb-4 relative z-10"
                   whileHover={{ scale: 1.2, rotate: 10 }}
                 >
-                  <Icon className="w-10 h-10 text-cyber-red" />
+                  <Icon className="w-10 h-10 text-brand" />
                 </motion.div>
 
                 {/* Content */}
                 <div className="relative z-10">
-                  <h3 className="text-lg font-orbitron font-bold text-white mb-2">
+                  <h3 className="text-lg font-display font-bold text-white mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-cyber-text-secondary text-sm mb-6 leading-relaxed">
+                  <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
                     {feature.description}
                   </p>
 
                   {/* Stats */}
-                  <div className="grid grid-cols-2 gap-4 pt-6 border-t border-cyber-red/20">
+                  <div className="grid grid-cols-2 gap-4 pt-6 border-t border-brand/20">
                     {feature.stats.map((stat, i) => (
                       <div key={i} className="text-center">
-                        <div className="font-orbitron font-bold text-cyber-red">
+                        <div className="font-display font-bold text-brand">
                           {stat.value}
                         </div>
-                        <div className="text-cyber-text-secondary text-xs mt-1">
+                        <div className="text-muted-foreground text-xs mt-1">
                           {stat.label}
                         </div>
                       </div>
@@ -184,7 +184,7 @@ export function FeaturesShowcase() {
           viewport={{ once: true }}
         >
           <motion.button
-            className="btn-neon"
+            className="btn-brand"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
