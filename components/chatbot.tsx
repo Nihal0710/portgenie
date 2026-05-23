@@ -17,7 +17,6 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import {
   Tooltip,
@@ -59,18 +58,31 @@ export function Chatbot() {
   ])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const shouldAutoScrollRef = useRef(true)
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    const container = scrollContainerRef.current
+    if (!container) return
+    container.scrollTo({ top: container.scrollHeight, behavior })
   }, [])
+
+  const handleMessagesScroll = () => {
+    const container = scrollContainerRef.current
+    if (!container) return
+    const distanceFromBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight
+    shouldAutoScrollRef.current = distanceFromBottom < 80
+  }
 
   const sendMessage = async (text: string) => {
     const trimmed = text.trim()
     if (!trimmed || isLoading) return
 
     setHasInteracted(true)
+    shouldAutoScrollRef.current = true
 
     const userMessage: ChatMessage = {
       role: "user",
@@ -133,7 +145,9 @@ export function Chatbot() {
   const handleSendMessage = () => sendMessage(input)
 
   useEffect(() => {
-    scrollToBottom()
+    if (shouldAutoScrollRef.current) {
+      scrollToBottom(messages.length <= 2 ? "auto" : "smooth")
+    }
   }, [messages, scrollToBottom])
 
   useEffect(() => {
@@ -213,9 +227,9 @@ export function Chatbot() {
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
             className="w-[min(100vw-2rem,24rem)] sm:w-96"
           >
-            <div className="glass-card-cyber animated-gradient-border overflow-hidden shadow-glow-lg flex flex-col max-h-[min(85vh,640px)]">
+            <div className="glass-card-cyber animated-gradient-border overflow-hidden shadow-glow-lg flex flex-col h-[min(85vh,640px)]">
               {/* Header */}
-              <div className="relative px-4 py-3 border-b border-cyber-red/30 bg-gradient-to-r from-black/80 via-cyber-red/10 to-black/80">
+              <div className="relative shrink-0 px-4 py-3 border-b border-cyber-red/30 bg-gradient-to-r from-black/80 via-cyber-red/10 to-black/80">
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyber-red to-transparent opacity-60" />
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-3 min-w-0">
@@ -291,9 +305,14 @@ export function Chatbot() {
                 </div>
               </div>
 
-              {/* Messages */}
-              <ScrollArea className="flex-1 min-h-0 max-h-[min(50vh,380px)] px-3 py-3">
-                <div className="flex flex-col gap-4 pr-2">
+              {/* Messages — native overflow so wheel/touch scroll works reliably */}
+              <div
+                ref={scrollContainerRef}
+                onScroll={handleMessagesScroll}
+                className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain px-3 py-3 [scrollbar-gutter:stable]"
+                style={{ WebkitOverflowScrolling: "touch" }}
+              >
+                <div className="flex flex-col gap-4 pr-1">
                   {messages.map((message, index) => (
                     <motion.div
                       key={`${message.timestamp.getTime()}-${index}`}
@@ -366,16 +385,16 @@ export function Chatbot() {
                       </div>
                     </motion.div>
                   ))}
-                  <div ref={messagesEndRef} />
+                  <div ref={messagesEndRef} aria-hidden />
                 </div>
-              </ScrollArea>
+              </div>
 
               {/* Quick prompts */}
               {showQuickPrompts && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
-                  className="px-3 pb-2 flex flex-wrap gap-1.5"
+                  className="shrink-0 px-3 pb-2 flex flex-wrap gap-1.5"
                 >
                   {QUICK_PROMPTS.map((prompt) => (
                     <button
@@ -391,7 +410,7 @@ export function Chatbot() {
               )}
 
               {/* Input */}
-              <div className="p-3 pt-2 border-t border-cyber-red/20 bg-black/40">
+              <div className="shrink-0 p-3 pt-2 border-t border-cyber-red/20 bg-black/40">
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
                     <Input
