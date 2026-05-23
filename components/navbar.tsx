@@ -1,78 +1,98 @@
-"use client"
+﻿"use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@clerk/nextjs"
 import { UserButton } from "@clerk/nextjs"
-import { LogOut, PlayCircle, Video, Menu, X } from "lucide-react"
+import { LogOut, PlayCircle, Video, Menu, X, Zap } from "lucide-react"
 import { ModeToggle } from "@/components/mode-toggle"
 import { WalletConnect } from "@/components/wallet-connect"
 import { useState } from "react"
+import { motion } from "framer-motion"
 
 export function Navbar() {
   const { isLoaded, isSignedIn } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
-      <div className="w-full px-4 md:px-6">
+    <header className="fixed top-0 left-0 right-0 z-50">
+      {/* Glassmorphic background */}
+      <div className="absolute inset-0 backdrop-blur-xl bg-black/40 border-b border-cyber-red/20" />
+      
+      {/* Glow effect */}
+      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-1 bg-gradient-to-r from-transparent via-cyber-red to-transparent blur-xl opacity-50" />
+
+      <div className="relative w-full px-4 md:px-6">
         <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center space-x-3">
-            <Image
-              src="/images/logo.png"
-              alt="PortGenie Logo"
-              width={40}
-              height={40}
-              className="h-10 w-auto"
-            />
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">PortGenie</span>
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-3 group">
+            <motion.div
+              className="p-2 rounded-lg bg-gradient-to-br from-cyber-red to-cyber-red-glow"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Zap className="h-5 w-5 text-white" />
+            </motion.div>
+            <span className="text-xl font-orbitron font-bold text-glow-lg group-hover:text-glow transition-all duration-300">
+              PortGenie 2.0
+            </span>
           </Link>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2"
+          <motion.button
+            className="md:hidden p-2 text-cyber-red hover:bg-cyber-red/10 rounded-lg transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            whileTap={{ scale: 0.95 }}
           >
             {isMobileMenuOpen ? (
               <X className="h-6 w-6" />
             ) : (
               <Menu className="h-6 w-6" />
             )}
-          </button>
+          </motion.button>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-4">
+          <nav className="hidden md:flex items-center gap-2">
             {isLoaded && isSignedIn ? (
               <>
                 <Link href="/dashboard">
-                  <Button variant="ghost" size="sm">Dashboard</Button>
+                  <motion.button
+                    className="px-4 py-2 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors duration-300 font-medium"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Dashboard
+                  </motion.button>
                 </Link>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="flex items-center gap-2 text-blue-700 hover:text-blue-800 hover:bg-blue-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-950/40"
+                <motion.button 
+                  className="px-4 py-2 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors duration-300 font-medium flex items-center gap-2"
                   onClick={() => window.open('/intro-video', '_blank')}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <PlayCircle className="h-4 w-4" />
-                  <span>Intro Video</span>
-                </Button>
+                  Intro Video
+                </motion.button>
                 <Link href="/dashboard/video-generation">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:bg-green-100 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-950/40"
+                  <motion.button
+                    className="px-4 py-2 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors duration-300 font-medium flex items-center gap-2"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     <Video className="h-4 w-4" />
-                    <span>Video Generation</span>
-                  </Button>
+                    Video
+                  </motion.button>
                 </Link>
                 <WalletConnect />
                 <Link href="/sign-out">
-                  <Button variant="ghost" size="sm" className="flex items-center gap-2 text-red-700 hover:text-red-800 hover:bg-red-100 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/40">
+                  <motion.button
+                    className="px-4 py-2 rounded-lg text-cyber-red hover:bg-cyber-red/20 transition-colors duration-300 font-medium flex items-center gap-2"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     <LogOut className="h-4 w-4" />
-                    <span>Sign Out</span>
-                  </Button>
+                    Sign Out
+                  </motion.button>
                 </Link>
                 <UserButton afterSignOutUrl="/" />
                 <ModeToggle />
@@ -80,10 +100,22 @@ export function Navbar() {
             ) : (
               <>
                 <Link href="/sign-in">
-                  <Button variant="ghost" size="sm">Sign In</Button>
+                  <motion.button
+                    className="px-4 py-2 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors duration-300 font-medium"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Sign In
+                  </motion.button>
                 </Link>
                 <Link href="/sign-up">
-                  <Button variant="default" size="sm">Sign Up</Button>
+                  <motion.button
+                    className="btn-neon text-sm"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Get Started
+                  </motion.button>
                 </Link>
                 <ModeToggle />
               </>
@@ -91,84 +123,70 @@ export function Navbar() {
           </nav>
 
           {/* Mobile Navigation */}
-          <div className={`fixed inset-0 z-50 bg-background md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
-            <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-4 border-b">
-                <Link href="/" className="flex items-center space-x-3">
-                  <Image
-                    src="/images/logo.png"
-                    alt="PortGenie Logo"
-                    width={40}
-                    height={40}
-                    className="h-10 w-auto"
-                  />
-                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">PortGenie</span>
-                </Link>
+          {isMobileMenuOpen && (
+            <motion.div
+              className="fixed inset-0 z-40 bg-black/80 backdrop-blur-xl md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="flex flex-col h-full pt-20 px-4 space-y-4">
                 <button
-                  className="p-2"
+                  className="absolute top-4 right-4 p-2 text-cyber-red"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <X className="h-6 w-6" />
                 </button>
-              </div>
-              <nav className="flex flex-col p-4 space-y-4">
+
                 {isLoaded && isSignedIn ? (
                   <>
                     <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button variant="ghost" size="sm" className="w-full justify-start">Dashboard</Button>
+                      <button className="w-full px-4 py-3 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors text-left">
+                        Dashboard
+                      </button>
                     </Link>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="w-full justify-start flex items-center gap-2 text-blue-700 hover:text-blue-800 hover:bg-blue-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-950/40"
+                    <button 
+                      className="w-full px-4 py-3 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors text-left flex items-center gap-2"
                       onClick={() => {
-                        window.open('/intro-video', '_blank');
-                        setIsMobileMenuOpen(false);
+                        window.open('/intro-video', '_blank')
+                        setIsMobileMenuOpen(false)
                       }}
                     >
                       <PlayCircle className="h-4 w-4" />
-                      <span>Intro Video</span>
-                    </Button>
+                      Intro Video
+                    </button>
                     <Link href="/dashboard/video-generation" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        className="w-full justify-start flex items-center gap-2 text-green-700 hover:text-green-800 hover:bg-green-100 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-950/40"
-                      >
+                      <button className="w-full px-4 py-3 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors text-left flex items-center gap-2">
                         <Video className="h-4 w-4" />
-                        <span>Video Generation</span>
-                      </Button>
+                        Video Generation
+                      </button>
                     </Link>
-                    <div className="py-2">
-                      <WalletConnect />
-                    </div>
-                    <Link href="/sign-out" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button variant="ghost" size="sm" className="w-full justify-start flex items-center gap-2 text-red-700 hover:text-red-800 hover:bg-red-100 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950/40">
-                        <LogOut className="h-4 w-4" />
-                        <span>Sign Out</span>
-                      </Button>
-                    </Link>
-                    <div className="flex items-center justify-between py-2">
-                      <UserButton afterSignOutUrl="/" />
-                      <ModeToggle />
+                    <div className="border-t border-cyber-red/20 pt-4">
+                      <Link href="/sign-out">
+                        <button className="w-full px-4 py-3 rounded-lg text-cyber-red hover:bg-cyber-red/10 transition-colors text-left flex items-center gap-2">
+                          <LogOut className="h-4 w-4" />
+                          Sign Out
+                        </button>
+                      </Link>
                     </div>
                   </>
                 ) : (
                   <>
                     <Link href="/sign-in" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button variant="ghost" size="sm" className="w-full justify-start">Sign In</Button>
+                      <button className="w-full px-4 py-3 rounded-lg text-cyber-text hover:bg-cyber-red/10 transition-colors">
+                        Sign In
+                      </button>
                     </Link>
                     <Link href="/sign-up" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button variant="default" size="sm" className="w-full justify-start">Sign Up</Button>
+                      <button className="w-full btn-neon">
+                        Get Started
+                      </button>
                     </Link>
-                    <div className="py-2">
-                      <ModeToggle />
-                    </div>
                   </>
                 )}
-              </nav>
-            </div>
-          </div>
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
     </header>

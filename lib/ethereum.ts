@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ethers, JsonRpcProvider, Wallet, Contract, id, type ContractTransactionResponse } from 'ethers';
 
 // ABI for a simple verification contract
 const VERIFICATION_CONTRACT_ABI = [
@@ -16,7 +16,7 @@ export const getProvider = () => {
     throw new Error('Ethereum provider URL not configured');
   }
   
-  return new ethers.providers.JsonRpcProvider(providerUrl, network);
+  return new JsonRpcProvider(providerUrl, network);
 };
 
 // Initialize contract instance
@@ -28,7 +28,7 @@ export const getVerificationContract = () => {
     throw new Error('Verification contract address not configured');
   }
   
-  return new ethers.Contract(contractAddress, VERIFICATION_CONTRACT_ABI, provider);
+  return new Contract(contractAddress, VERIFICATION_CONTRACT_ABI, provider);
 };
 
 // Get wallet with private key
@@ -40,24 +40,39 @@ export const getWallet = () => {
   }
   
   const provider = getProvider();
-  return new ethers.Wallet(privateKey, provider);
+  return new Wallet(privateKey, provider);
 };
 
 // Verify a document on the blockchain
 export const verifyDocument = async (documentHash: string, documentURI: string) => {
   try {
     const wallet = getWallet();
-    const contract = getVerificationContract().connect(wallet);
+    const contract = getVerificationContract().connect(wallet) as Contract;
     
-    const tx = await contract.verifyDocument(documentHash, documentURI);
+    const tx = (await contract.verifyDocument(documentHash, documentURI)) as ContractTransactionResponse;
     const receipt = await tx.wait();
     
-    // Extract verification ID from event logs
-    const event = receipt.events?.find((e: ethers.Event) => e.event === 'DocumentVerified');
-    const verificationId = event?.args?.verificationId.toString();
+    if (!receipt) {
+      throw new Error('Transaction receipt not available');
+    }
+
+    // Extract verification ID from event logs (ethers v6)
+    const iface = new ethers.Interface(VERIFICATION_CONTRACT_ABI);
+    let verificationId: string | undefined;
+    for (const log of receipt.logs) {
+      try {
+        const parsed = iface.parseLog(log);
+        if (parsed?.name === 'DocumentVerified') {
+          verificationId = parsed.args?.verificationId?.toString();
+          break;
+        }
+      } catch {
+        // Not our event
+      }
+    }
     
     return {
-      transactionHash: receipt.transactionHash,
+      transactionHash: receipt.hash,
       verificationId,
       blockNumber: receipt.blockNumber,
       timestamp: Math.floor(Date.now() / 1000)
@@ -89,7 +104,7 @@ export const getVerificationDetails = async (verificationId: string) => {
       verifier: details.verifier,
       documentHash: details.documentHash,
       documentURI: details.documentURI,
-      timestamp: details.timestamp.toNumber()
+      timestamp: Number(details.timestamp)
     };
   } catch (error) {
     console.error('Error getting verification details:', error);
@@ -98,12 +113,12 @@ export const getVerificationDetails = async (verificationId: string) => {
 };
 
 // Create a hash of a document
-export const createDocumentHash = (document: any) => {
-  return ethers.utils.id(JSON.stringify(document));
+export const createDocumentHash = (document: unknown) => {
+  return id(JSON.stringify(document));
 };
 
 // Verify a portfolio
-export const verifyPortfolio = async (portfolioData: any, ipfsHash: string) => {
+export const verifyPortfolio = async (portfolioData: unknown, ipfsHash: string) => {
   const documentHash = createDocumentHash(portfolioData);
   const documentURI = `ipfs://${ipfsHash}`;
   
@@ -111,7 +126,7 @@ export const verifyPortfolio = async (portfolioData: any, ipfsHash: string) => {
 };
 
 // Verify a resume
-export const verifyResume = async (resumeData: any, ipfsHash: string) => {
+export const verifyResume = async (resumeData: unknown, ipfsHash: string) => {
   const documentHash = createDocumentHash(resumeData);
   const documentURI = `ipfs://${ipfsHash}`;
   

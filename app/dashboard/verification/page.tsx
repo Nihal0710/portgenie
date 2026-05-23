@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import { getUserWeb3Credentials, getUserIpfsFiles } from '@/lib/supabase';
 import VerificationClient from './verification-client';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Web3 Verification - PortGenie',

@@ -657,3 +657,13 @@ export async function getUserVideoStats(userId: string) {
     return null;
   }
 }
+
+/** @deprecated Use getUserPortfolios */
+export const getPortfolios = getUserPortfolios;
+
+/** @deprecated Use getUserResumes */
+export const getResumes = getUserResumes;
+
+export async function createUserProfile(userId: string, userData: any) {
+  return updateUserProfile(userId, userData);
+}
